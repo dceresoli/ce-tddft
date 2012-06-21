@@ -1,0 +1,37 @@
+# Makefile for ce-tddft
+
+QE_SOURCE=@qe_source@
+include $(QE_SOURCE)/make.sys
+FFLAGS += -warn all
+DFLAGS += @dflags_gipaw@
+
+# location of needed modules
+MODFLAGS = $(MOD_FLAG)$(QE_SOURCE)/iotk/src $(MOD_FLAG)$(QE_SOURCE)/Modules \
+           $(MOD_FLAG)$(QE_SOURCE)/PW/src $(MOD_FLAG).
+
+TDDFT_OBJS = tddft_module.o tddft_main.o tddft_routines.o tddft_ch_psi_all.o \
+	     dipole.o update_ham.o apply_efield.o tddft_optical_absorption.o \
+	     tddft_cgsolver_module.o
+
+LIBOBJS = $(QE_SOURCE)/flib/ptools.a $(QE_SOURCE)/flib/flib.a $(QE_SOURCE)/clib/clib.a \
+ 	  $(QE_SOURCE)/iotk/src/libiotk.a
+QEMODS  = $(QE_SOURCE)/Modules/libqemod.a
+PWOBJS  = $(QE_SOURCE)/PW/src/libpw.a
+NEBOBJS = $(QE_SOURCE)/NEB/src/libneb.a
+
+all: tddft.x
+
+tddft.x: $(TDDFT_OBJS) $(PWOBJS) $(QEMODS) $(LIBOBJS) # $(NEBOBJS)
+	$(LD) $(LDFLAGS) -o $@ $(TDDFT_OBJS) $(PWOBJS) $(QEMODS) $(LIBOBJS) $(LIBS)
+	(cd ../bin; ln -sf ../src/tddft.x .)
+
+clean:
+	-/bin/rm -f tddft.x *.o *.F90 *__genmod.f90 *.d *.mod *.i *.L
+
+distclean: clean
+	-/bin/rm -f Makefile make.depend
+
+include make.depend
+
+# DO NOT DELETE
+
