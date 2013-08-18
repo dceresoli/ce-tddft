@@ -17,7 +17,7 @@ subroutine tddft_optical_absorption
   !----------------------------------------------------------------------
   USE kinds,                       ONLY : dp
   USE io_global,                   ONLY : stdout, ionode
-  USE io_files,                    ONLY : nwordwfc, iunwfc, iunigk, find_free_unit
+  USE io_files,                    ONLY : nwordwfc, iunwfc, iunigk
   USE ions_base,                   ONLY : nat, ntyp => nsp, ityp
   USE cell_base,                   ONLY : at, bg, omega, tpiba, tpiba2
   USE wavefunctions_module,        ONLY : evc
@@ -50,7 +50,8 @@ subroutine tddft_optical_absorption
   integer :: istep, lter, flag_global
   integer :: ik, is, ibnd
   complex(dp) :: ee                     ! i*dt/2
-  real(dp) :: anorm  
+  real(dp) :: anorm
+  integer, external :: find_free_unit
   external tddft_ch_psi_all
 
   ! allocate memory
