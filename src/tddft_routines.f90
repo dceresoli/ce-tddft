@@ -132,7 +132,7 @@ SUBROUTINE tddft_openfil
   USE wvfct,            ONLY : nbnd, npwx
   USE ldaU,             ONLY : lda_plus_u
   USE klist,            ONLY : nks
-  USE io_files,         ONLY : prefix, iunat, iunsat, iunwfc, iunigk, &
+  USE io_files,         ONLY : prefix, iunsat, iunwfc, iunigk, &
                                nwordwfc, nwordatwfc, tmp_dir, wfc_dir
   USE noncollin_module, ONLY : npol
   USE mp_global,        ONLY : kunit
@@ -162,7 +162,6 @@ SUBROUTINE tddft_openfil
   ! ... it is opened and closed for each reading-writing operation  
   nwordatwfc = 2*npwx*natomwfc*npol
   if ( lda_plus_u ) then
-     call diropn( iunat,  'atwfc',  nwordatwfc, exst )
      call diropn( iunsat, 'satwfc', nwordatwfc, exst )
   end if
 
