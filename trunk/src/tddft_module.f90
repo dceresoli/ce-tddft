@@ -23,7 +23,7 @@ MODULE tddft_module
   real(dp) :: dt                   ! timestep
   integer  :: nstep                ! number of timesteps for real-time tddft
   real(dp) :: conv_threshold       ! cg convergence threshold
-  logical  :: nupdate_Dnm          ! update USPP Dnm matrix every n steps
+  integer  :: nupdate_Dnm          ! update USPP Dnm matrix every n steps
   logical  :: l_circular_dichroism ! calculate circular dichroism
   logical  :: l_tddft_restart      ! restart propagation from the last step
   integer  :: iverbosity           ! verbosity level (default = 1)
