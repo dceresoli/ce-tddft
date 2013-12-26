@@ -2,7 +2,6 @@
 
 QE_SOURCE=@qe_source@
 include $(QE_SOURCE)/make.sys
-FFLAGS += -warn all
 DFLAGS += @dflags_gipaw@
 
 # location of needed modules
