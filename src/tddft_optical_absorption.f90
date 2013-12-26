@@ -19,7 +19,7 @@ subroutine tddft_optical_absorption
   USE io_global,                   ONLY : stdout, ionode
   USE io_files,                    ONLY : nwordwfc, iunwfc, iunigk
   USE ions_base,                   ONLY : nat, ntyp => nsp, ityp
-  USE cell_base,                   ONLY : at, bg, omega, tpiba, tpiba2
+  USE cell_base,                   ONLY : at, bg, omega, tpiba, tpiba2, alat
   USE wavefunctions_module,        ONLY : evc
   USE klist,                       ONLY : nks, nkstot, wk, xk, nelec, ngk
   USE wvfct,                       ONLY : nbnd, npwx, npw, igk, wg, g2kin, current_k, ecutwfc
@@ -28,7 +28,8 @@ subroutine tddft_optical_absorption
   USE mp_global,                   ONLY : my_pool_id, inter_pool_comm, intra_pool_comm
   USE mp,                          ONLY : mp_sum, mp_barrier
   USE gvect,                       ONLY : ngm, g
-  USE fft_base,                    ONLY : dfftp, dffts
+  USE gvecs,                       ONLY : nls
+  USE fft_base,                    ONLY : dfftp, dfftp
   USE buffers,                     ONLY : get_buffer, save_buffer
   USE fixed_occ,                   ONLY : tfixed_occ 
   USE uspp,                        ONLY : nkb, vkb, deeq
@@ -133,8 +134,7 @@ subroutine tddft_optical_absorption
       if (l_circular_dichroism)  then
         circular_local = (0.d0, 0.d0)
         circular = (0.d0, 0.d0)
-        ! disabled for the time being
-        !!call compute_circular_dichroism(circular_local)
+        call compute_circular_dichroism(circular_local)
         circular(1:3, current_spin) = circular_local(1:3)
       end if
         
@@ -180,6 +180,7 @@ subroutine tddft_optical_absorption
         write(stdout,'(''CHARGE '',I1,1X,I6,3E16.6)') is, istep, charge(is)
         write(stdout,'(''DIP    '',I1,1X,I6,3E16.6)') is, istep, dipole(:,is)
         !write(stdout,'(''QUAD   '',I1,1X,I6,9E18.9)') is, istep, quadrupole(:,:,is)
+        write(stdout,'(''ANG    '',I1,1X,I6,3E16.6)') is, istep, circular(:,is)
       enddo
     endif
      
@@ -243,7 +244,7 @@ CONTAINS
     circular = (0.d0, 0.d0)
     circular_local = (0.d0, 0.d0)
 
-    allocate (r_pos(3,dfftp%nnr), r_pos_s(3,dffts%nnr))
+    allocate (r_pos(3,dfftp%nnr), r_pos_s(3,dfftp%nnr))
     call setup_position_operator
     
   END SUBROUTINE allocate_optical
@@ -263,6 +264,108 @@ CONTAINS
 
   END SUBROUTINE deallocate_optical
    
+   
+  !====================================================================
+  ! compute circular dichroism (EXPERIMENTAL, NORM-CONSERVING ONLY)
+  !====================================================================      
+  subroutine compute_circular_dichroism(cd)
+    USE fft_base,               ONLY : dfftp
+    USE fft_interfaces,         ONLY : invfft
+    USE mp_global,              ONLY : me_pool
+    IMPLICIT NONE
+    REAL(DP) :: xx(dfftp%nnr), yy(dfftp%nnr), zz(dfftp%nnr), gk
+    INTEGER  :: ik, ibnd, i, ii, jj, kk, index0, index, ir, ipol, ind, i_current_spin, ig
+    complex(dp) :: p_psi(npwx), p_psi_r(dfftp%nnr, 3), cd(3, nspin), psic1(dfftp%nnr)
+    
+    xx(:) = 0.d0
+    yy(:) = 0.d0
+    zz(:) = 0.d0
+    
+    index0 = 0
+
+#ifdef __PARA
+  do i = 1, me_pool
+    index0 = index0 + dfftp%nr1x*dfftp%nr2x*dfftp%npp(i)
+  enddo
+#endif
+
+  ! loop over real space grid
+  do ir = 1, dfftp%nnr
+    index = index0 + ir - 1
+    kk     = index / (dfftp%nr1x*dfftp%nr2x)
+    index = index - (dfftp%nr1x*dfftp%nr2x)*kk
+    jj     = index / dfftp%nr1x
+    index = index - dfftp%nr1x*jj
+    ii     = index
+
+             xx(ir) = &
+                  dble( ii-1 )/dble(dfftp%nr1) * at(1,1) * alat + &
+                  dble( jj-1 )/dble(dfftp%nr2) * at(1,2) * alat + &
+                  dble( kk-1 )/dble(dfftp%nr3) * at(1,3) * alat
+             
+             yy(ir) = &
+                  dble( ii-1 )/dble(dfftp%nr1) * at(2,1) * alat + &
+                  dble( jj-1 )/dble(dfftp%nr2) * at(2,2) * alat + &
+                  dble( kk-1 )/dble(dfftp%nr3) * at(2,3) * alat
+             
+             zz(ir) = &
+                  dble( ii-1 )/dble(dfftp%nr1) * at(3,1) * alat + &
+                  dble( jj-1 )/dble(dfftp%nr2) * at(3,2) * alat + &
+                  dble( kk-1 )/dble(dfftp%nr3) * at(3,3) * alat
+             
+    end do
+    
+    cd(:,:) = (0.d0, 0.d0)
+    
+    do ik = 1, nks
+       
+       if (nbnd_occ(ik) > 0) then
+          
+       i_current_spin = isk(ik)
+       call gk_sort(xk(1,ik), ngm, g, ecutwfc/tpiba2, npw, igk, g2kin)
+       g2kin(:) = g2kin(:) * tpiba2
+       
+       do ibnd = 1, nbnd_occ(ik)
+          
+          p_psi_r(:, :) = (0.d0, 0.d0)
+          do ipol = 1, 3
+             p_psi(:) = (0.d0, 0.d0)
+             do ig = 1, npw
+                gk = xk(ipol,ik) + g(ipol,igk(ig))
+                p_psi(ig) = gk * tpiba * tddft_psi(ig, ibnd, ik)
+             end do
+             psic1(:) = (0.d0, 0.d0)
+             psic1(nls(igk(1:npw))) = p_psi(:)
+             call invfft('Wave', psic1, dfftp)
+             p_psi_r(:,ipol) = psic1(:)
+          end do
+          
+          ! transform wavefunction from reciprocal space into real space
+          psic1(:) = (0.d0, 0.d0)
+          psic1(nls(igk(1:npw))) = tddft_psi(1:npw, ibnd, ik)
+          call invfft('Wave', psic1, dfftp)
+          
+          do ind = 1, dfftp%nnr
+             cd(1, i_current_spin) = cd(1, i_current_spin) + &
+                  conjg(psic1(ind)) * ( yy(ind) * p_psi_r(ind,3) - zz(ind) * p_psi_r(ind,2) )
+             cd(2, i_current_spin) = cd(2, i_current_spin) + &
+                  conjg(psic1(ind)) * ( zz(ind) * p_psi_r(ind,1) - xx(ind) * p_psi_r(ind,3) )
+             cd(3, i_current_spin) = cd(3, i_current_spin) + &
+                  conjg(psic1(ind)) * ( xx(ind) * p_psi_r(ind,2) - yy(ind) * p_psi_r(ind,1) )
+          end do
+          
+          
+       end do
+
+       end if
+       
+    end do
+    cd = cd  / dble(dfftp%nnr)
+    
+    
+    RETURN
+  end subroutine compute_circular_dichroism
+
 END SUBROUTINE tddft_optical_absorption
  
 
