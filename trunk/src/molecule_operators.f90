@@ -1,16 +1,18 @@
 !
-! Copyright (C) 2001-2010 Quantum-ESPRESSO group
+! Copyright (C) 2001-2014 Quantum-ESPRESSO group
 ! This file is distributed under the terms of the
 ! GNU General Public License. See the file `License'
 ! in the root directory of the present distribution,
 ! or http://www.gnu.org/copyleft/gpl.txt .
 !
 
-!==============================================================================
-! Setup the position operator in real space. The origin is set to center
-! of ionic charge. (r is in units of alat)
-!==============================================================================   
-SUBROUTINE setup_position_operator
+!-----------------------------------------------------------------------
+SUBROUTINE molecule_setup_r
+  !-----------------------------------------------------------------------
+  !
+  ! ... Setup the position operator in real space. The origin is set to center
+  ! ... of ionic charge. (r is in units of alat)
+  !
   USE kinds,        ONLY : dp
   USE mp_global,    ONLY : me_pool, intra_pool_comm
   USE mp,           ONLY : mp_sum
@@ -18,7 +20,7 @@ SUBROUTINE setup_position_operator
   USE ions_base,    ONLY : nat, tau, ityp, zv
   USE cell_base,    ONLY : at, bg, alat
   USE tddft_module, ONLY : r_pos, r_pos_s
-  IMPLICIT NONE
+  implicit none
 
   real(dp) :: zvtot, x0(3), r(3)
   real(dp) :: inv_nr1, inv_nr2, inv_nr3
@@ -40,7 +42,7 @@ SUBROUTINE setup_position_operator
   inv_nr3 = 1.d0 / real(dfftp%nr3,dp)
 
   index0 = 0
-#ifdef __PARA
+#ifdef __MPI
   do i = 1, me_pool
     index0 = index0 + dfftp%nr1x*dfftp%nr2x*dfftp%npp(i)
   enddo
@@ -70,14 +72,13 @@ SUBROUTINE setup_position_operator
     r_pos(1:3,ir) = r(1:3)
   enddo
 
-
   ! wavefunction (smooth) grid
   inv_nr1s = 1.d0 / real(dffts%nr1,dp)
   inv_nr2s = 1.d0 / real(dffts%nr2,dp)
   inv_nr3s = 1.d0 / real(dffts%nr3,dp)
 
   index0 = 0
-#ifdef __PARA
+#ifdef __MPI
   do i = 1, me_pool
     index0 = index0 + dffts%nr1x * dffts%nr2x * dffts%npp(i)
   enddo
@@ -107,14 +108,15 @@ SUBROUTINE setup_position_operator
     r_pos_s(1:3,ir) = r(1:3)
   enddo
 
+END SUBROUTINE molecule_setup_r
 
-END SUBROUTINE setup_position_operator
 
-
-!==============================================================================
-! Compute electron dipole moment using total charge density (Xiaofeng Qian)
-!==============================================================================   
-SUBROUTINE compute_electron_dipole(charge, dip)
+!-----------------------------------------------------------------------
+SUBROUTINE molecule_compute_dipole(charge, dip)
+  !-----------------------------------------------------------------------
+  !
+  ! ... Compute electron dipole moment using total charge density
+  !
   USE kinds,        ONLY : dp
   USE mp_global,    ONLY : me_pool, intra_pool_comm
   USE mp,           ONLY : mp_sum
@@ -123,7 +125,8 @@ SUBROUTINE compute_electron_dipole(charge, dip)
   USE scf,          ONLY : rho
   USE lsda_mod,     ONLY : nspin
   USE tddft_module, ONLY : r_pos
-  IMPLICIT NONE
+  implicit none
+
   real(dp), intent(out) :: charge(nspin), dip(3,nspin)
   integer :: ispin, ipol, nrp
 
@@ -139,19 +142,21 @@ SUBROUTINE compute_electron_dipole(charge, dip)
   charge = charge * omega / real(nrp, dp)  
   dip = dip * omega / real(nrp, dp) * alat
 
-#ifdef __PARA
+#ifdef __MPI
   call mp_sum(charge, intra_pool_comm)
   call mp_sum(dip, intra_pool_comm)
 #endif
   call stop_clock('dipole')
     
-END SUBROUTINE compute_electron_dipole
+END SUBROUTINE molecule_compute_dipole
 
 
-!==============================================================================
-! Compute electron quadrupoledipole moment using total charge density
-!==============================================================================   
-SUBROUTINE compute_electron_quadrupole(quad)
+!-----------------------------------------------------------------------
+SUBROUTINE molecule_compute_quadrupole(quad)
+  !-----------------------------------------------------------------------
+  !
+  ! ... Compute electron quadrupoledipole moment using total charge density
+  !
   USE kinds,        ONLY : dp
   USE mp_global,    ONLY : me_pool, intra_pool_comm
   USE mp,           ONLY : mp_sum
@@ -160,7 +165,8 @@ SUBROUTINE compute_electron_quadrupole(quad)
   USE scf,          ONLY : rho
   USE lsda_mod,     ONLY : nspin
   USE tddft_module, ONLY : r_pos
-  IMPLICIT NONE
+  implicit none
+
   real(dp), intent(out) :: quad(3,3,nspin)
   integer :: ispin, ipol, jpol, nrp
 
@@ -176,11 +182,11 @@ SUBROUTINE compute_electron_quadrupole(quad)
   nrp = dfftp%nr1 * dfftp%nr2 * dfftp%nr3 
   quad = quad * omega / real(nrp, dp) * (alat*alat)
 
-#ifdef __PARA
+#ifdef __MPI
   call mp_sum(quad, intra_pool_comm)
 #endif
   call stop_clock('quadrupole')
     
-END SUBROUTINE compute_electron_quadrupole
+END SUBROUTINE molecule_compute_quadrupole
 
 

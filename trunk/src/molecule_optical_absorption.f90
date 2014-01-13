@@ -1,5 +1,5 @@
 !
-! Copyright (C) 2001-2010 Quantum-ESPRESSO group
+! Copyright (C) 2001-2014 Quantum-ESPRESSO group
 ! This file is distributed under the terms of the
 ! GNU General Public License. See the file `License'
 ! in the root directory of the present distribution,
@@ -7,7 +7,7 @@
 !
 
 !-----------------------------------------------------------------------
-subroutine tddft_optical_absorption
+subroutine molecule_optical_absorption
   !----------------------------------------------------------------------
   !  ... Compute optical absorption spectrum by real-time TDDFT 
   !  ... References:
@@ -25,7 +25,7 @@ subroutine tddft_optical_absorption
   USE wvfct,                       ONLY : nbnd, npwx, npw, igk, wg, g2kin, current_k, ecutwfc
   USE lsda_mod,                    ONLY : current_spin, lsda, isk, nspin
   USE becmod,                      ONLY : becp  
-  USE mp_global,                   ONLY : my_pool_id, inter_pool_comm, intra_pool_comm
+  USE mp_pools,                    ONLY : my_pool_id, inter_pool_comm, intra_pool_comm
   USE mp,                          ONLY : mp_sum, mp_barrier
   USE gvect,                       ONLY : ngm, g
   USE gvecs,                       ONLY : nls
@@ -34,7 +34,6 @@ subroutine tddft_optical_absorption
   USE fixed_occ,                   ONLY : tfixed_occ 
   USE uspp,                        ONLY : nkb, vkb, deeq
   USE ldaU,                        ONLY : lda_plus_U
-  USE tddft_cgsolver_module,       ONLY : tddft_cgsolver_initialize, tddft_cgsolver_finalize, tddft_cgsolver
   USE uspp_param,                  ONLY : nh
   USE scf,                         ONLY : rho, rho_core, rhog_core, vltot, v, vrs
   USE control_flags,               ONLY : tqr
@@ -54,6 +53,9 @@ subroutine tddft_optical_absorption
   real(dp) :: anorm
   integer, external :: find_free_unit
   external tddft_ch_psi_all
+
+  ! TODO: gk_sort
+  ! TODO: restart
 
   ! allocate memory
   call allocate_optical()
@@ -101,8 +103,8 @@ subroutine tddft_optical_absorption
   do istep = 1, nstep
      
     ! calculate dipole moment along x, y, and z direction
-    call compute_electron_dipole( charge, dipole )
-    !call compute_electron_quadrupole( quadrupole )
+    call molecule_compute_dipole( charge, dipole )
+    !call molecule_compute_quadrupole( quadrupole )
 
     ! loop over k-points     
     if (nks > 1) rewind (iunigk)
@@ -245,7 +247,7 @@ CONTAINS
     circular_local = (0.d0, 0.d0)
 
     allocate (r_pos(3,dfftp%nnr), r_pos_s(3,dfftp%nnr))
-    call setup_position_operator
+    call molecule_setup_r
     
   END SUBROUTINE allocate_optical
   
@@ -366,6 +368,6 @@ CONTAINS
     RETURN
   end subroutine compute_circular_dichroism
 
-END SUBROUTINE tddft_optical_absorption
+END SUBROUTINE molecule_optical_absorption
  
 

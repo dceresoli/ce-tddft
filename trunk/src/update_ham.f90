@@ -1,15 +1,17 @@
 !
-! Copyright (C) 2001-2010 Quantum-ESPRESSO group
+! Copyright (C) 2001-2014 Quantum-ESPRESSO group
 ! This file is distributed under the terms of the
 ! GNU General Public License. See the file `License'
 ! in the root directory of the present distribution,
 ! or http://www.gnu.org/copyleft/gpl.txt .
 !
 
-!====================================================================
-! Update the hamiltonian
-!====================================================================      
+!-----------------------------------------------------------------------
 SUBROUTINE update_hamiltonian(istep)
+  !-----------------------------------------------------------------------
+  !
+  ! ... Update the hamiltonian
+  !
   USE kinds,         ONLY : dp
   USE ldaU,          ONLY : lda_plus_U
   USE scf,           ONLY : rho, rho_core, rhog_core, vltot, v, kedtau, vrs
@@ -22,7 +24,7 @@ SUBROUTINE update_hamiltonian(istep)
   USE tddft_module,  ONLY : nupdate_Dnm, iverbosity
   USE becmod,        ONLY : becp, allocate_bec_type, deallocate_bec_type
   USE wvfct,         ONLY : nbnd
-  IMPLICIT NONE
+  implicit none
   integer, intent(in) :: istep
   real(dp) :: charge, ehart, etxc, vtxc, eth, etotefield
 

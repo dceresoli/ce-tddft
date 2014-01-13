@@ -1,5 +1,5 @@
 !
-! Copyright (C) 2001-2010 PWSCF group
+! Copyright (C) 2001-2015 PWSCF group
 ! This file is distributed under the terms of the
 ! GNU General Public License. See the file `License'
 ! in the root directory of the present distribution,
@@ -7,7 +7,11 @@
 !
 
 !-----------------------------------------------------------------------
+#ifdef __BANDS
+subroutine tddft_ch_psi_all (n, h, ah, ee, ik, m, ibnd_start, ibnd_end)
+#else
 subroutine tddft_ch_psi_all (n, h, ah, ee, ik, m)
+#endif
   !-----------------------------------------------------------------------
   !
   ! This routine applies the operator ( S + ee * H), where, ee = i * dt/2
@@ -15,21 +19,25 @@ subroutine tddft_ch_psi_all (n, h, ah, ee, ik, m)
   !
   USE kinds,        ONLY : dp
   USE wvfct,        ONLY : npwx, nbnd
-  USE uspp,         ONLY : vkb
+  USE uspp,         ONLY : vkb, nkb
   USE becmod,       ONLY : becp, calbec
-  USE mp_global,    ONLY : intra_pool_comm
-  USE mp,           ONLY : mp_sum
   USE tddft_module, ONLY : nbnd_occ, alpha_pv
-
+  USE mp_pools,     ONLY : intra_pool_comm
+  USE mp,           ONLY : mp_sum
+#ifdef __BANDS
+  USE mp_bands,     ONLY : intra_bgrp_comm
+#endif
   implicit none
 
   integer :: n, m, ik
   ! input: the dimension of h
   ! input: the number of bands
   ! input: the k point
-
+#ifdef __BANDS
+  integer, intent(in) :: ibnd_start, ibnd_end
+#endif
   complex(DP) :: ee
-  ! input: the eigenvalue
+  ! input: i*dt/2
 
   complex(DP) :: h (npwx, m), ah (npwx, m)
   ! input: the vector
@@ -44,12 +52,12 @@ subroutine tddft_ch_psi_all (n, h, ah, ee, ik, m)
   call start_clock ('ch_psi')
   allocate (hpsi( npwx , m))
   hpsi (:,:) = cmplx(0.d0, 0.d0)
-  !
+
   !   compute the product of the hamiltonian H and ultrasoft projection operator S with the h vector
-  !
+  !   TODO: band version
   call h_psi (npwx, n, m, h, hpsi)
   call s_psi (npwx, n, m, h, ah)
-  !
+
   call start_clock ('last')
   do ibnd = 1, m
      do ig = 1, n
