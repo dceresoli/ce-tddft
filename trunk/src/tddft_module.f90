@@ -6,6 +6,8 @@
 ! or http://www.gnu.org/copyleft/gpl.txt .
 !
 
+! TODO: nsave, restart_mode
+
 !-----------------------------------------------------------------------
 MODULE tddft_module
   !-----------------------------------------------------------------------
@@ -27,6 +29,7 @@ MODULE tddft_module
   logical  :: l_circular_dichroism ! calculate circular dichroism
   logical  :: l_tddft_restart      ! restart propagation from the last step
   integer  :: iverbosity           ! verbosity level (default = 1)
+  logical  :: molecule             ! use molecular routuines
 
   complex(dp), parameter :: i_complex = (0.0_dp,1.0_dp)
 
@@ -38,6 +41,8 @@ MODULE tddft_module
   integer :: nwordtdwfc 
   integer, parameter :: iunevcn = 52      ! evc for restart
   real(dp) :: alpha_pv                    ! shift of conduction levels
+
+  integer :: tddft_exit_code = 0
 
 END MODULE tddft_module
 
