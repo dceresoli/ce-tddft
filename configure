@@ -586,7 +586,7 @@ PACKAGE_URL=''
 
 ac_subst_vars='LTLIBOBJS
 LIBOBJS
-dflags_gipaw
+dflags_tddft
 qe_source
 target_alias
 host_alias
@@ -1764,7 +1764,7 @@ then
 fi
 
 # process options
-#dflags_tdfft=''
+dflags_tdfft=''
 #if test $BAND_PARALLEL = yes ; then
 #  dflags_tddft="${dflags_tddft} -D__BANDS"
 #fi

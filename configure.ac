@@ -40,14 +40,14 @@ then
 fi
 
 # process options
-#dflags_tdfft=''
+dflags_tdfft=''
 #if test $BAND_PARALLEL = yes ; then 
 #  dflags_tddft="${dflags_tddft} -D__BANDS"
 #fi
 
 # export settings to generated files
 AC_SUBST(qe_source)
-AC_SUBST(dflags_gipaw)
+AC_SUBST(dflags_tddft)
 AC_OUTPUT([makedeps.sh src/Makefile src/Makefile-gpu], [chmod +x makedeps.sh])
 
 # default commands

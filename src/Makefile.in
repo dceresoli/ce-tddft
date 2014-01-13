@@ -8,9 +8,10 @@ DFLAGS += @dflags_tddft@
 MODFLAGS = $(MOD_FLAG)$(QE_SOURCE)/iotk/src $(MOD_FLAG)$(QE_SOURCE)/Modules \
            $(MOD_FLAG)$(QE_SOURCE)/PW/src $(MOD_FLAG).
 
-TDDFT_OBJS = tddft_module.o tddft_main.o tddft_routines.o tddft_ch_psi_all.o \
-	     dipole.o update_ham.o apply_efield.o tddft_optical_absorption.o \
-	     tddft_cgsolver_module.o
+TDDFT_OBJS = tddft_version.o tddft_module.o tddft_main.o tddft_routines.o \
+	     tddft_setup.o tddft_ch_psi_all.o tddft_cgsolver_module.o \
+	     update_ham.o apply_efield.o molecule_optical_absorption.o \
+	     molecule_operators.o 
 
 LIBOBJS = $(QE_SOURCE)/flib/ptools.a $(QE_SOURCE)/flib/flib.a $(QE_SOURCE)/clib/clib.a \
  	  $(QE_SOURCE)/iotk/src/libiotk.a

@@ -1,16 +1,18 @@
 !
-! Copyright (C) 2001-2010 Quantum-ESPRESSO group
+! Copyright (C) 2001-2014 Quantum-ESPRESSO group
 ! This file is distributed under the terms of the
 ! GNU General Public License. See the file `License'
 ! in the root directory of the present distribution,
 ! or http://www.gnu.org/copyleft/gpl.txt .
 !
 
-!==============================================================================
-! Apply an electric field impuse at t = 0, a homogeneous phase-shift in 
-! each band
-!==============================================================================   
+!-----------------------------------------------------------------------
 SUBROUTINE apply_electric_field(tddft_psi)
+  !-----------------------------------------------------------------------
+  !
+  ! ... Apply an electric field impuse at t = 0, a homogeneous phase-shift
+  ! ... to each band
+  !
   USE kinds,        ONLY : dp
   USE mp_global,    ONLY : me_pool, intra_pool_comm
   USE mp,           ONLY : mp_sum
@@ -25,7 +27,7 @@ SUBROUTINE apply_electric_field(tddft_psi)
   USE fft_base,       ONLY : dffts
   USE fft_interfaces, ONLY : invfft, fwfft
   USE tddft_module
-  IMPLICIT NONE
+  implicit none
 
   complex(dp), intent(out) :: tddft_psi(npwx,nbnd)
   integer :: ik, ibnd, ir
