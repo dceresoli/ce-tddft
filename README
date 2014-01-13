@@ -1,0 +1,50 @@
+This is a real-time TDDFT code for quantum-Espresso.
+
+Authors:
+* Xiaofeng Qian                      intergrator, CGS routine, operators 
+* Davide Ceresoli                    QE integration
+
+Contact:
+* Davide Ceresoli     <dceresoli@gmail.com>
+
+
+Build instructions:
+===================
+1) Configure and compile Quantum-Espresso in the usual way. Supported
+   version are '5.0.2' and the current SVN version.
+
+2) Download from SVN. You can build CE-TDDFT outside the Quantum-Espresso folder.
+   svn checkout http://ce-tddft.googlecode.com/svn/trunk/ ce-tddft
+
+3) Build CE-TDDFT:
+   cd ce-tddft
+   ./configure --with-qe-source=<quantum espresso folder containing make.sys>
+   (for example: ./configure --with-qe-source=$HOME/Codes/espresso-5.0.2)
+   make
+
+4) CE-TDDFT will be built according to the options and libraries specified
+   in make.sys and the gipaw.x executable will be places in the bin folder.
+
+
+Quick start guide:
+==================
+To calculate NMR/EPR parameters you need:
+
+1) pseudopotentials containing the GIPAW reconstruction (look into folder pseudo)
+
+2) run pw.x to perform the SCF calculation
+
+3) run gipaw.x to calculate parameters (look into folder examples for
+   NMR shielding, EFG, EPR g-tensor and hyperfine couplings)
+
+
+TODO:
+=====
+- NL-terms in circular dichroism
+- restart/checkpointing
+- in-memory evolution for molecules
+- projection over AO's
+- integrators: taylor-n, cranck-nichoson-2
+- spin-orbit
+- periodic crystals
+

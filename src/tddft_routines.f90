@@ -293,6 +293,9 @@ SUBROUTINE tddft_memory_report
   write(stdout,'(8x,"KS wavefunctions at k     ",f10.2," Mb",5x,"(",i8,",",i5,")")') &
      complex_size*nbnd*npol*DBLE(npwx)/Mb, npwx*npol,nbnd
 
+  write(stdout,'(8x,"First-order wavefunctions ",f10.2," Mb",5x,"(",i8,",",i5,",",i3")")') &
+     complex_size*nbnd*npol*DBLE(npwx)*10/Mb, npwx*npol,nbnd,10
+
   write(stdout,'(8x,"Charge/spin density       ",f10.2," Mb",5x,"(",i8,",",i5,")")') &
      real_size*dble(dffts%nnr)*nspin/Mb, dffts%nnr, nspin
   
