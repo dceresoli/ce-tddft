@@ -1,7 +1,7 @@
 # Autoconf template for ce-tddft
-AC_INIT(ce-tddft, 5.0wvn, dceresoli@gmail.com, ce-tddft)
+AC_INIT(ce-tddft, 5.0svn, dceresoli@gmail.com, ce-tddft)
 
-# The only option is the quantum-Espresso source directory (QE_SOURCE)
+# Option: Quantum-Espresso source directory (QE_SOURCE)
 AC_ARG_WITH(qe-source,
    [AC_HELP_STRING([--with-qe-source=DIR],[Quantum-Espresso source directory (QE_SOURCE)])],
    [qe_source=$withval],
@@ -24,23 +24,31 @@ AC_CHECK_FILE(${qe_source}/Modules/version.f90, [], [AC_MSG_ERROR([Cannot find v
 AC_MSG_CHECKING([Quantum-Espresso version])
 version=`grep version_number ${qe_source}/Modules/version.f90 | cut -d\' -f2`
 AC_MSG_RESULT([$version])
-
 case $version in
-  4.99* ) ;;
-  5.0* ) ;;
-  *) AC_MSG_ERROR([Cannot compile against this version of quantum-Espresso]) ;;
+  5.0.2 ) ;;
+  *) AC_MSG_ERROR([Cannot compile against this version of Quantum-Espresso]) ;;
 esac
 
+# Extract svn revision
+AC_MSG_CHECKING([Quantum-Espresso SVN revision])
+revision=`grep svn_revision ${qe_source}/Modules/version.f90 | cut -d\' -f2`
+AC_MSG_RESULT([$revision])
+good_revision=10684
+if test $revision -lt ${good_revision}
+then
+  AC_MSG_ERROR([Cannot compile against this SVN revision of Quantum-Espresso. Please checkout revision >$good_revision])
+fi
+
 # process options
-#dflags_gipaw=''
+#dflags_tdfft=''
 #if test $BAND_PARALLEL = yes ; then 
-#  dflags_gipaw="${dflags_gipaw} -D__BANDS"
+#  dflags_tddft="${dflags_tddft} -D__BANDS"
 #fi
 
 # export settings to generated files
 AC_SUBST(qe_source)
 AC_SUBST(dflags_gipaw)
-AC_OUTPUT([makedeps.sh src/Makefile], [chmod +x makedeps.sh])
+AC_OUTPUT([makedeps.sh src/Makefile src/Makefile-gpu], [chmod +x makedeps.sh])
 
 # default commands
 ./makedeps.sh
