@@ -64,7 +64,8 @@ SUBROUTINE tddft_setup
      call errore('gipaw_setup','TDDFT + two Fermi energies not implemented', 1)
 
   ! computes the number of occupied bands for each k point
-  nbnd_occ (:) = 0
+  allocate(nbnd_occ(nks))
+  nbnd_occ(:) = 0
   if (lgauss) then
      write(stdout,*)
      write(stdout,'(5X,''smearing ngauss='',I4,2X,''degauss='',F8.4,'' Ry'')') &

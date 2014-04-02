@@ -73,6 +73,7 @@ PROGRAM tddft_main
  
   ! read ground state wavefunctions
   call read_file
+
 #ifdef __MPI
   use_para_diag = check_para_diag(nbnd)
 #else
