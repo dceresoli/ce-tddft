@@ -31,6 +31,7 @@ molecule_optical_absorption.o : /home/ceresoli/Codes/qe-espresso/trunk/Modules/i
 molecule_optical_absorption.o : /home/ceresoli/Codes/qe-espresso/trunk/Modules/kind.o
 molecule_optical_absorption.o : /home/ceresoli/Codes/qe-espresso/trunk/Modules/mp.o
 molecule_optical_absorption.o : /home/ceresoli/Codes/qe-espresso/trunk/Modules/mp_global.o
+molecule_optical_absorption.o : /home/ceresoli/Codes/qe-espresso/trunk/Modules/mp_pools.o
 molecule_optical_absorption.o : /home/ceresoli/Codes/qe-espresso/trunk/Modules/recvec.o
 molecule_optical_absorption.o : /home/ceresoli/Codes/qe-espresso/trunk/Modules/uspp.o
 molecule_optical_absorption.o : /home/ceresoli/Codes/qe-espresso/trunk/Modules/wavefunctions.o
@@ -38,7 +39,6 @@ molecule_optical_absorption.o : /home/ceresoli/Codes/qe-espresso/trunk/PW/src/bu
 molecule_optical_absorption.o : /home/ceresoli/Codes/qe-espresso/trunk/PW/src/ldaU.o
 molecule_optical_absorption.o : /home/ceresoli/Codes/qe-espresso/trunk/PW/src/pwcom.o
 molecule_optical_absorption.o : /home/ceresoli/Codes/qe-espresso/trunk/PW/src/scf_mod.o
-molecule_optical_absorption.o : tddft_cgsolver.o
 molecule_optical_absorption.o : tddft_module.o
 tddft_cgsolver.o : /home/ceresoli/Codes/qe-espresso/trunk/Modules/kind.o
 tddft_cgsolver.o : /home/ceresoli/Codes/qe-espresso/trunk/Modules/mp.o
@@ -46,7 +46,8 @@ tddft_cgsolver.o : /home/ceresoli/Codes/qe-espresso/trunk/Modules/mp_pools.o
 tddft_ch_psi_all.o : /home/ceresoli/Codes/qe-espresso/trunk/Modules/becmod.o
 tddft_ch_psi_all.o : /home/ceresoli/Codes/qe-espresso/trunk/Modules/kind.o
 tddft_ch_psi_all.o : /home/ceresoli/Codes/qe-espresso/trunk/Modules/mp.o
-tddft_ch_psi_all.o : /home/ceresoli/Codes/qe-espresso/trunk/Modules/mp_global.o
+tddft_ch_psi_all.o : /home/ceresoli/Codes/qe-espresso/trunk/Modules/mp_bands.o
+tddft_ch_psi_all.o : /home/ceresoli/Codes/qe-espresso/trunk/Modules/mp_pools.o
 tddft_ch_psi_all.o : /home/ceresoli/Codes/qe-espresso/trunk/Modules/uspp.o
 tddft_ch_psi_all.o : /home/ceresoli/Codes/qe-espresso/trunk/PW/src/pwcom.o
 tddft_ch_psi_all.o : tddft_module.o

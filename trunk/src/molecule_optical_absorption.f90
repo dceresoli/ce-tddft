@@ -182,7 +182,7 @@ subroutine molecule_optical_absorption
         write(stdout,'(''CHARGE '',I1,1X,I6,3E16.6)') is, istep, charge(is)
         write(stdout,'(''DIP    '',I1,1X,I6,3E16.6)') is, istep, dipole(:,is)
         !write(stdout,'(''QUAD   '',I1,1X,I6,9E18.9)') is, istep, quadrupole(:,:,is)
-        write(stdout,'(''ANG    '',I1,1X,I6,3E16.6)') is, istep, circular(:,is)
+        !write(stdout,'(''ANG    '',I1,1X,I6,3E16.6)') is, istep, circular(:,is)
       enddo
     endif
      

@@ -188,7 +188,7 @@ SUBROUTINE tddft_openfil
   USE buffers,          ONLY : open_buffer
   USE control_flags,    ONLY : io_level    
   IMPLICIT NONE  
-
+  character*1, parameter :: dir(3) = (/'x', 'y', 'z'/)
   logical :: exst
 
   !
@@ -199,9 +199,16 @@ SUBROUTINE tddft_openfil
   nwordwfc = nbnd*npwx*npol
   CALL open_buffer( iunwfc, 'wfc', nwordwfc, io_level, exst )
 
+  ! do not overwrite wfc
+  nwordwfc = nbnd*npwx*npol
+  CALL open_buffer( iunevcn, 'wfc'//dir(e_direction), nwordwfc, io_level, exst )
+
+  ! for restart
+  nwordtdwfc = nbnd*npwx*npol
+  CALL open_buffer( iuntdwfc, 'tmp'//dir(e_direction), nwordtdwfc, io_level, exst )
+
   ! ... Needed for LDA+U
   ! ... iunhub contains the (orthogonalized) atomic wfcs * S
-  
   nwordwfcU = npwx*nwfcU*npol
   IF ( lda_plus_u ) &
      CALL open_buffer( iunhub, 'hub', nwordwfcU, io_level, exst )
@@ -220,6 +227,7 @@ SUBROUTINE tddft_closefil
   USE buffers,          ONLY : close_buffer
 
   call close_buffer( iunwfc, 'keep' )
+  call close_buffer( iunevcn, 'keep' )
   if ( lda_plus_u ) call close_buffer ( iunhub, status = 'keep' )
 
 END SUBROUTINE tddft_closefil
