@@ -15,6 +15,6 @@ MODULE tddft_version
   !
   SAVE
   !
-  CHARACTER (LEN=12) :: tddft_svn_revision = "10"
+  CHARACTER (LEN=12) :: tddft_svn_revision = "12"
   !
 END MODULE tddft_version

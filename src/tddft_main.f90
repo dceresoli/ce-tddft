@@ -65,7 +65,7 @@ PROGRAM tddft_main
   write(stdout,'(5X,''***** This is TDDFT svn revision '',A,'' *****'')') tddft_svn_revision
   write(stdout,*)
 
-  call start_clock('TDFFT')
+  call start_clock('PWSCF')
   call tddft_readin()
   call check_stop_init()
 
