@@ -7,6 +7,9 @@ AC_ARG_WITH(qe-source,
    [qe_source=$withval],
    [qe_source=$QE_SOURCE])
 
+# make path absolute
+abspath=`readlink -f ${qe_source} 2>/dev/null` && qe_source=$abspath
+
 # Option: enable band parallelization
 #AC_ARG_ENABLE(band-parallel,
 #   [AC_HELP_STRING([--enable-band-parallel],[enable band parallelization (EXPERIMENTAL!)])],
@@ -27,6 +30,7 @@ AC_MSG_RESULT([$version])
 case $version in
   5.0.2 ) ;;
   5.0.99 ) ;;
+  5.1    ) ;;
   *) AC_MSG_ERROR([Cannot compile against this version of Quantum-Espresso]) ;;
 esac
 

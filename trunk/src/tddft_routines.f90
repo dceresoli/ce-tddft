@@ -275,7 +275,7 @@ SUBROUTINE print_clock_tddft
   call print_clock( 'ALLTOALL' )
   write(stdout,*)
 #endif
-  call print_clock ('TDFFT') 
+  call print_clock ('TDDFT') 
 
 END SUBROUTINE print_clock_tddft
 
