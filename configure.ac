@@ -31,6 +31,7 @@ case $version in
   5.0.2 ) ;;
   5.0.99 ) ;;
   5.1    ) ;;
+  5.1.1  ) ;;
   *) AC_MSG_ERROR([Cannot compile against this version of Quantum-Espresso]) ;;
 esac
 
