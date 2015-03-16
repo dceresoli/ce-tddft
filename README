@@ -23,19 +23,7 @@ Build instructions:
    make
 
 4) CE-TDDFT will be built according to the options and libraries specified
-   in make.sys and the gipaw.x executable will be places in the bin folder.
-
-
-Quick start guide:
-==================
-To calculate NMR/EPR parameters you need:
-
-1) pseudopotentials containing the GIPAW reconstruction (look into folder pseudo)
-
-2) run pw.x to perform the SCF calculation
-
-3) run gipaw.x to calculate parameters (look into folder examples for
-   NMR shielding, EFG, EPR g-tensor and hyperfine couplings)
+   in make.sys and the tddft.x executable will be places in the bin folder.
 
 
 TODO:
