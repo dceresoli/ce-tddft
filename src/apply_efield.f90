@@ -20,7 +20,8 @@ SUBROUTINE apply_electric_field(tddft_psi)
   USE ions_base,    ONLY : nat, tau, ityp, zv
   USE cell_base,    ONLY : at, bg, alat
   USE gvecs,        ONLY : nls
-  USE wvfct,        ONLY : current_k, igk, npw, npwx, nbnd
+  USE wvfct,        ONLY : current_k, npw, npwx, nbnd
+  USE klist,        ONLY : igk_k
   USE io_files,     ONLY : nwordwfc, iunwfc
   USE buffers,      ONLY : save_buffer
   USE wavefunctions_module, ONLY : evc
@@ -39,7 +40,7 @@ SUBROUTINE apply_electric_field(tddft_psi)
   do ibnd = 1, nbnd_occ(ik)
     ! transform wavefunction from reciprocal space into real space
     psic = (0.d0, 0.d0)
-    psic(nls(igk(1:npw))) = evc(1:npw, ibnd)
+    psic(nls(igk_k(1:npw,ik))) = evc(1:npw, ibnd)
     call invfft ('Wave', psic, dffts)  
 
     do ir = 1, dffts%nnr
@@ -49,9 +50,9 @@ SUBROUTINE apply_electric_field(tddft_psi)
 
     call fwfft ('Wave', psic, dffts)  
        
-    evc(1:npw,ibnd) = psic(nls(igk(1:npw)))
+    evc(1:npw,ibnd) = psic(nls(igk_k(1:npw,ik)))
   enddo
-    
+  
   call save_buffer (evc, nwordwfc, iunevcn, ik)
     
   tddft_psi(1:npwx,1:nbnd_occ(ik)) = evc(1:npwx,1:nbnd_occ(ik))

@@ -17,19 +17,19 @@ subroutine molecule_optical_absorption
   !----------------------------------------------------------------------
   USE kinds,                       ONLY : dp
   USE io_global,                   ONLY : stdout, ionode
-  USE io_files,                    ONLY : nwordwfc, iunwfc, iunigk
+  USE io_files,                    ONLY : nwordwfc, iunwfc
   USE ions_base,                   ONLY : nat, ntyp => nsp, ityp
   USE cell_base,                   ONLY : at, bg, omega, tpiba, tpiba2, alat
   USE wavefunctions_module,        ONLY : evc
-  USE klist,                       ONLY : nks, nkstot, wk, xk, nelec, ngk
-  USE wvfct,                       ONLY : nbnd, npwx, npw, igk, wg, g2kin, current_k, ecutwfc
+  USE klist,                       ONLY : nks, nkstot, wk, xk, nelec, ngk, igk_k
+  USE wvfct,                       ONLY : nbnd, npwx, npw, wg, g2kin, current_k
   USE lsda_mod,                    ONLY : current_spin, lsda, isk, nspin
   USE becmod,                      ONLY : becp  
   USE mp_pools,                    ONLY : my_pool_id, inter_pool_comm, intra_pool_comm
   USE mp,                          ONLY : mp_sum, mp_barrier
   USE gvect,                       ONLY : ngm, g
   USE gvecs,                       ONLY : nls
-  USE fft_base,                    ONLY : dfftp, dfftp
+  USE fft_base,                    ONLY : dfftp, dffts
   USE buffers,                     ONLY : get_buffer, save_buffer
   USE fixed_occ,                   ONLY : tfixed_occ 
   USE uspp,                        ONLY : nkb, vkb, deeq
@@ -54,7 +54,6 @@ subroutine molecule_optical_absorption
   integer, external :: find_free_unit
   external tddft_ch_psi_all
 
-  ! TODO: gk_sort
   ! TODO: restart
 
   ! allocate memory
@@ -66,7 +65,7 @@ subroutine molecule_optical_absorption
   call tddft_cgsolver_initialize(npwx, nbnd_occ_max)
   if (iverbosity > 0) then
     write(stdout,'(5X,''Done with tddft_cgsolver_initialize'')')
-    call flush_unit(stdout)
+    flush(stdout)
   endif
  
   ! print the legend
@@ -75,15 +74,13 @@ subroutine molecule_optical_absorption
   ! check if we are restarting
   if (l_tddft_restart) then
 
-     if (nks > 1) rewind (iunigk)
      do ik = 1, nks
         current_k = ik
         current_spin = isk(ik)
         
-        ! initialize at k-point k 
-        call gk_sort(xk(1,ik), ngm, g, ecutwfc/tpiba2, npw, igk, g2kin)
-        g2kin = g2kin * tpiba2
-        call init_us_2(npw, igk, xk(1,ik), vkb)
+        ! initialize at k-point k
+        call g2_kin(ik)
+        call init_us_2(npw, igk_k(1,ik), xk(1,ik), vkb)
         
         ! read wfcs from file and compute becp
         evc = (0.d0, 0.d0)
@@ -91,11 +88,8 @@ subroutine molecule_optical_absorption
      end do
      
      call update_hamiltonian(-1)
-  end if
  
-  if (iverbosity > 0) then
-    write(stdout,'(5X,''Done with restart'')')
-    call flush_unit(stdout)
+     if (iverbosity > 0) write(stdout,'(5X,''Done with restart'')')
   endif
 
 
@@ -107,15 +101,13 @@ subroutine molecule_optical_absorption
     !call molecule_compute_quadrupole( quadrupole )
 
     ! loop over k-points     
-    if (nks > 1) rewind (iunigk)
     do ik = 1, nks
       current_k = ik
       current_spin = isk(ik)
         
-      ! initialize at k-point k 
-      call gk_sort(xk(1,ik), ngm, g, ecutwfc/tpiba2, npw, igk, g2kin)
-      g2kin = g2kin * tpiba2
-      call init_us_2(npw, igk, xk(1,ik), vkb)
+      ! initialize at k-point k
+      call g2_kin(ik)
+      call init_us_2(npw, igk_k(1,ik), xk(1,ik), vkb)
         
       ! read wfcs from file and compute becp
       evc = (0.d0, 0.d0)
@@ -151,25 +143,24 @@ subroutine molecule_optical_absorption
       call s_psi(npwx, npw, nbnd_occ(ik), evc, tddft_spsi)
         
       ! calculate (S - H*dt*i/2) |\psi_current>
-      b = (0.d0, 0.d0)
       b(1:npw, 1:nbnd_occ(ik)) = tddft_spsi(1:npw,1:nbnd_occ(ik)) - ee * tddft_hpsi(1:npw,1:nbnd_occ(ik))
         
       ! solve A * x = b
       call tddft_cgsolver(tddft_ch_psi_all, b, tddft_psi(:,:,1), npwx, npw, &
                           conv_threshold, ik, lter, flag_global, anorm, &
                           nbnd_occ(ik), ee)
-        
+ 
       ! update the wavefunctions
       tddft_psi(:,:,2) = tddft_psi(:,:,1)
       evc(:,1:nbnd_occ(ik)) = tddft_psi(:,1:nbnd_occ(ik),1)
 
       ! save wavefunctions to disk
       call save_buffer (evc, nwordwfc, iunevcn, ik)
-      call save_buffer (tddft_psi, nwordtdwfc, iuntdwfc, ik)
+      call save_buffer (tddft_psi(:,:,1:2), nwordtdwfc, iuntdwfc, ik)
         
     enddo ! ik
 
-#ifdef __PARA
+#ifdef __MPI
     ! reduce over k-points
     if (l_circular_dichroism) call mp_sum(circular, inter_pool_comm)
     call mp_sum(charge, inter_pool_comm)
@@ -189,7 +180,7 @@ subroutine molecule_optical_absorption
     ! update the hamiltonian (recompute charge and potential)
     call update_hamiltonian(istep)
      
-    call flush_unit(stdout)
+    flush(stdout)
      
   enddo      ! end of TDDFT loop
 
@@ -207,10 +198,10 @@ CONTAINS
     write(stdout,'(5X,''Output quantities:'')')
     write(stdout,'(5X,''  CHARGE spin  istep  charge'')')
     write(stdout,'(5X,''  DIP    spin  istep  dipole(1:3)'')')
-    write(stdout,'(5X,''  QUAD   spin  istep  quadrupole(1:3,1:3)'')')
+    !write(stdout,'(5X,''  QUAD   spin  istep  quadrupole(1:3,1:3)'')')
     write(stdout,'(5X,''  ANG    spin  istep  Re[L(1:3)]  Im[L(1:3)]'')')
     write(stdout,*)
-    call flush_unit(stdout)
+    flush(stdout)
   END SUBROUTINE print_legend
 
   
@@ -246,7 +237,7 @@ CONTAINS
     circular = (0.d0, 0.d0)
     circular_local = (0.d0, 0.d0)
 
-    allocate (r_pos(3,dfftp%nnr), r_pos_s(3,dfftp%nnr))
+    allocate (r_pos(3,dfftp%nnr), r_pos_s(3,dffts%nnr))
     call molecule_setup_r
     
   END SUBROUTINE allocate_optical
@@ -285,7 +276,7 @@ CONTAINS
     
     index0 = 0
 
-#ifdef __PARA
+#ifdef __MPI
   do i = 1, me_pool
     index0 = index0 + dfftp%nr1x*dfftp%nr2x*dfftp%npp(i)
   enddo
@@ -324,8 +315,6 @@ CONTAINS
        if (nbnd_occ(ik) > 0) then
           
        i_current_spin = isk(ik)
-       call gk_sort(xk(1,ik), ngm, g, ecutwfc/tpiba2, npw, igk, g2kin)
-       g2kin(:) = g2kin(:) * tpiba2
        
        do ibnd = 1, nbnd_occ(ik)
           
@@ -333,18 +322,18 @@ CONTAINS
           do ipol = 1, 3
              p_psi(:) = (0.d0, 0.d0)
              do ig = 1, npw
-                gk = xk(ipol,ik) + g(ipol,igk(ig))
+                gk = xk(ipol,ik) + g(ipol,igk_k(ig,ik))
                 p_psi(ig) = gk * tpiba * tddft_psi(ig, ibnd, ik)
              end do
              psic1(:) = (0.d0, 0.d0)
-             psic1(nls(igk(1:npw))) = p_psi(:)
+             psic1(nls(igk_k(1:npw,ik))) = p_psi(:)
              call invfft('Wave', psic1, dfftp)
              p_psi_r(:,ipol) = psic1(:)
           end do
           
           ! transform wavefunction from reciprocal space into real space
           psic1(:) = (0.d0, 0.d0)
-          psic1(nls(igk(1:npw))) = tddft_psi(1:npw, ibnd, ik)
+          psic1(nls(igk_k(1:npw,ik))) = tddft_psi(1:npw, ibnd, ik)
           call invfft('Wave', psic1, dfftp)
           
           do ind = 1, dfftp%nnr

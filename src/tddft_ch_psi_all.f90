@@ -52,6 +52,7 @@ subroutine tddft_ch_psi_all (n, h, ah, ee, ik, m)
   call start_clock ('ch_psi')
   allocate (hpsi( npwx , m))
   hpsi (:,:) = cmplx(0.d0, 0.d0)
+  ah (:,:) = cmplx(0.d0, 0.d0)
 
   !   compute the product of the hamiltonian H and ultrasoft projection operator S with the h vector
   !   TODO: band version

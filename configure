@@ -607,6 +607,7 @@ infodir
 docdir
 oldincludedir
 includedir
+runstatedir
 localstatedir
 sharedstatedir
 sysconfdir
@@ -672,6 +673,7 @@ datadir='${datarootdir}'
 sysconfdir='${prefix}/etc'
 sharedstatedir='${prefix}/com'
 localstatedir='${prefix}/var'
+runstatedir='${localstatedir}/run'
 includedir='${prefix}/include'
 oldincludedir='/usr/include'
 docdir='${datarootdir}/doc/${PACKAGE_TARNAME}'
@@ -924,6 +926,15 @@ do
   | -silent | --silent | --silen | --sile | --sil)
     silent=yes ;;
 
+  -runstatedir | --runstatedir | --runstatedi | --runstated \
+  | --runstate | --runstat | --runsta | --runst | --runs \
+  | --run | --ru | --r)
+    ac_prev=runstatedir ;;
+  -runstatedir=* | --runstatedir=* | --runstatedi=* | --runstated=* \
+  | --runstate=* | --runstat=* | --runsta=* | --runst=* | --runs=* \
+  | --run=* | --ru=* | --r=*)
+    runstatedir=$ac_optarg ;;
+
   -sbindir | --sbindir | --sbindi | --sbind | --sbin | --sbi | --sb)
     ac_prev=sbindir ;;
   -sbindir=* | --sbindir=* | --sbindi=* | --sbind=* | --sbin=* \
@@ -1061,7 +1072,7 @@ fi
 for ac_var in	exec_prefix prefix bindir sbindir libexecdir datarootdir \
 		datadir sysconfdir sharedstatedir localstatedir includedir \
 		oldincludedir docdir infodir htmldir dvidir pdfdir psdir \
-		libdir localedir mandir
+		libdir localedir mandir runstatedir
 do
   eval ac_val=\$$ac_var
   # Remove trailing slashes.
@@ -1214,6 +1225,7 @@ Fine tuning of the installation directories:
   --sysconfdir=DIR        read-only single-machine data [PREFIX/etc]
   --sharedstatedir=DIR    modifiable architecture-independent data [PREFIX/com]
   --localstatedir=DIR     modifiable single-machine data [PREFIX/var]
+  --runstatedir=DIR       modifiable per-process data [LOCALSTATEDIR/run]
   --libdir=DIR            object code libraries [EPREFIX/lib]
   --includedir=DIR        C header files [PREFIX/include]
   --oldincludedir=DIR     C header files for non-gcc [/usr/include]
@@ -1694,15 +1706,15 @@ abspath=`readlink -f ${qe_source} 2>/dev/null` && qe_source=$abspath
 #)
 
 # Look for make.sys
-as_ac_File=`$as_echo "ac_cv_file_${qe_source}/make.sys" | $as_tr_sh`
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for ${qe_source}/make.sys" >&5
-$as_echo_n "checking for ${qe_source}/make.sys... " >&6; }
+as_ac_File=`$as_echo "ac_cv_file_${qe_source}/make.inc" | $as_tr_sh`
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for ${qe_source}/make.inc" >&5
+$as_echo_n "checking for ${qe_source}/make.inc... " >&6; }
 if eval \${$as_ac_File+:} false; then :
   $as_echo_n "(cached) " >&6
 else
   test "$cross_compiling" = yes &&
   as_fn_error $? "cannot check for file existence when cross compiling" "$LINENO" 5
-if test -r "${qe_source}/make.sys"; then
+if test -r "${qe_source}/make.inc"; then
   eval "$as_ac_File=yes"
 else
   eval "$as_ac_File=no"
@@ -1714,7 +1726,7 @@ $as_echo "$ac_res" >&6; }
 if eval test \"x\$"$as_ac_File"\" = x"yes"; then :
 
 else
-  as_fn_error $? "Cannot find make.sys in ${qe_source}" "$LINENO" 5
+  as_fn_error $? "Cannot find make.inc in ${qe_source}" "$LINENO" 5
 fi
 
 
@@ -1750,9 +1762,7 @@ version=`grep version_number ${qe_source}/Modules/version.f90 | cut -d\' -f2`
 { $as_echo "$as_me:${as_lineno-$LINENO}: result: $version" >&5
 $as_echo "$version" >&6; }
 case $version in
-  5.0.2 ) ;;
-  5.0.99 ) ;;
-  5.1*   ) ;;
+  6.1*   ) ;;
   *) as_fn_error $? "Cannot compile against this version of Quantum-Espresso" "$LINENO" 5 ;;
 esac
 
@@ -1762,7 +1772,7 @@ $as_echo_n "checking Quantum-Espresso SVN revision... " >&6; }
 revision=`grep svn_revision ${qe_source}/Modules/version.f90 | cut -d\' -f2`
 { $as_echo "$as_me:${as_lineno-$LINENO}: result: $revision" >&5
 $as_echo "$revision" >&6; }
-good_revision=10836
+good_revision=13369
 if test $revision -lt ${good_revision}
 then
   as_fn_error $? "Cannot compile against this SVN revision of Quantum-Espresso. Please checkout revision >$good_revision" "$LINENO" 5

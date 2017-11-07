@@ -105,7 +105,8 @@ SUBROUTINE tddft_cgsolver (A, b, x, ndmx, ndim, tol, ik, iter, flag_global,  &
   rho1 = 0.d0
   r    = (0.d0, 0.d0)
   Ax   = (0.d0, 0.d0)
-  
+  anorm = 0.d0
+ 
   flag           = 1
   imin           = 0
   
@@ -129,6 +130,7 @@ SUBROUTINE tddft_cgsolver (A, b, x, ndmx, ndim, tol, ik, iter, flag_global,  &
      call mp_sum(normr, intra_pool_comm)
 #endif  
      normr = dsqrt(normr)
+     anorm = anorm + normr
      
      if (normr < tolb) then
         flag = 0

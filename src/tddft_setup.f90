@@ -23,7 +23,7 @@ SUBROUTINE tddft_setup
   USE fft_base,      ONLY : dfftp
   USE gvecs,         ONLY : doublegrid
   USE klist,         ONLY : xk, degauss, ngauss, nks, nelec, lgauss, wk, two_fermi_energies
-  USE ktetra,        ONLY : ltetra
+  USE klist,         ONLY : ltetra
   USE noncollin_module,  ONLY : noncolin
   USE constants,     ONLY : degspin, pi
   USE symm_base,     ONLY : nsym, s

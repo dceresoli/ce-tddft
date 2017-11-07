@@ -36,7 +36,7 @@ SUBROUTINE tddft_readin()
   call input_from_file()
 
   ! define input defult values
-  call get_env( 'ESPRESSO_TMPDIR', tmp_dir )
+  call get_environment_variable( 'ESPRESSO_TMPDIR', tmp_dir ) 
   if (trim(tmp_dir) == ' ') tmp_dir = './scratch/'
   tmp_dir = trimcheck(tmp_dir)
   job          = ''
@@ -165,7 +165,7 @@ SUBROUTINE tddft_summary
 
   write(stdout,*)
 
-  call flush_unit( stdout )
+  flush(stdout)
 
 END SUBROUTINE tddft_summary
   
@@ -204,7 +204,7 @@ SUBROUTINE tddft_openfil
   CALL open_buffer( iunevcn, 'wfc'//dir(e_direction), nwordwfc, io_level, exst )
 
   ! for restart
-  nwordtdwfc = nbnd*npwx*npol
+  nwordtdwfc = nbnd*npwx*npol*2
   CALL open_buffer( iuntdwfc, 'tmp'//dir(e_direction), nwordtdwfc, io_level, exst )
 
   ! ... Needed for LDA+U
