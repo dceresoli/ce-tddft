@@ -1,5 +1,10 @@
 This is a real-time TDDFT code for quantum-Espresso.
 
+News:
+=====
+07/11/2017:  compatible with QE-6.1
+
+
 Authors:
 * Xiaofeng Qian                      intergrator, CGS routine, operators 
 * Davide Ceresoli                    QE integration
