@@ -92,6 +92,7 @@ SUBROUTINE tddft_cgsolver (A, b, x, ndmx, ndim, tol, ik, iter, flag_global,  &
   real(dp), external    :: ddot
   integer :: imin, stag, i, ibnd
 
+  flag_global = 0
   if (.not. allocated(r)) call errore('tddft_cgsolver', 'cgsolver not initialized', 1)
   
   call start_clock ('cgsolver')

@@ -1,5 +1,5 @@
 # Autoconf template for ce-tddft
-AC_INIT(ce-tddft, 5.0svn, dceresoli@gmail.com, ce-tddft)
+AC_INIT(ce-tddft, 6.1, dceresoli@gmail.com, ce-tddft)
 
 # Option: Quantum-Espresso source directory (QE_SOURCE)
 AC_ARG_WITH(qe-source,

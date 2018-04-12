@@ -46,7 +46,7 @@ SUBROUTINE molecule_setup_r
   ir_end = MIN(dfftp%nnr,dfftp%nr1x*dfftp%nr2x*dfftp%npp(me_bgrp+1))
 #else
   index0 = 0
-  ir_end = nnr
+  ir_end = dfftp%nnr
 #endif
 
   ! loop over real space grid
@@ -82,7 +82,7 @@ SUBROUTINE molecule_setup_r
   ir_end = MIN(dffts%nnr,dffts%nr1x*dffts%nr2x*dffts%npp(me_bgrp+1))
 #else
   index0 = 0
-  ir_end = nnr
+  ir_end = dffts%nnr
 #endif
 
   ! loop over real space grid
