@@ -35,6 +35,8 @@ Official source releases are found [here](https://github.com/dceresoli/ce-tddft/
 * Jul 17, 2017: ce-tddft is now compatible with QE-6.1
 
 ### TODO
+- Ehrenfest dynamics
+- arbitrary pulses
 - improve performance of NL-terms in circular dichroism
 - restart/checkpointing
 - in-memory evolution for molecules
