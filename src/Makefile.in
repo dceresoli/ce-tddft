@@ -8,7 +8,7 @@ DFLAGS += @dflags_tddft@
 MODFLAGS = $(MOD_FLAG)$(QE_SOURCE)/iotk/src $(MOD_FLAG)$(QE_SOURCE)/Modules \
            $(MOD_FLAG)$(QE_SOURCE)/FFTXlib $(MOD_FLAG)$(QE_SOURCE)/LAXlib \
            $(MOD_FLAG)$(QE_SOURCE)/PW/src \
-           $(MOD_FLAG).
+           $(MOD_FLAG)$(QE_SOURCE)/UtilXlib $(MOD_FLAG).
 
 TDDFT_OBJS = tddft_version.o tddft_module.o tddft_main.o tddft_routines.o \
 	     tddft_setup.o tddft_ch_psi_all.o tddft_cgsolver.o \
@@ -18,7 +18,8 @@ TDDFT_OBJS = tddft_version.o tddft_module.o tddft_main.o tddft_routines.o \
 LIBOBJS = $(QE_SOURCE)/clib/clib.a $(QE_SOURCE)/iotk/src/libiotk.a
 QEMODS = $(QE_SOURCE)/Modules/libqemod.a \
          $(QE_SOURCE)/FFTXlib/libqefft.a \
-         $(QE_SOURCE)/LAXlib/libqela.a
+         $(QE_SOURCE)/LAXlib/libqela.a \
+         $(QE_SOURCE)/UtilXlib/libutil.a
 PWOBJS = $(QE_SOURCE)/PW/src/libpw.a
 
 all: version tddft.x

@@ -1,5 +1,5 @@
 !
-! Copyright (C) 2001-2014 Quantum-ESPRESSO group
+! Copyright (C) 2001-2018 Quantum-ESPRESSO group
 ! This file is distributed under the terms of the
 ! GNU General Public License. See the file `License'
 ! in the root directory of the present distribution,
@@ -17,24 +17,37 @@ PROGRAM tddft_main
   ! ...   Xiaofeng Qian, Ju Li, Xi Lin, and Sidney Yip, PRB 73, 035408 (2006)
   ! ...
   USE kinds,           ONLY : DP
-  USE io_global,       ONLY : stdout
+  USE io_files,        ONLY : tmp_dir !, create_directory
+  USE io_global,       ONLY : stdout, meta_ionode, meta_ionode_id
   USE mp,              ONLY : mp_bcast
-  USE tddft_module,    ONLY : job, molecule, tddft_exit_code
+  USE cell_base,       ONLY : tpiba
+  USE tddft_module,    ONLY : job, molecule, max_seconds, tddft_exit_code
+  USE check_stop,      ONLY : check_stop_init
   USE control_flags,   ONLY : io_level, gamma_only, use_para_diag, twfcollect
   USE mp_global,       ONLY : mp_startup, nproc_pool_file
   USE mp_bands,        ONLY : nbgrp
   USE mp_pools,        ONLY : nproc_pool
-  USE check_stop,      ONLY : check_stop_init
-  USE environment,     ONLY : environment_start
+  USE mp_world,        ONLY : world_comm
+  USE environment,     ONLY : environment_start, environment_end
+  USE lsda_mod,        ONLY : nspin
+  USE wvfct,           ONLY : nbnd
+  USE uspp,            ONLY : okvan
   USE wvfct,           ONLY : nbnd
   USE io_global,       ONLY : stdout
   USE noncollin_module,ONLY : noncolin
+  ! for pluginization
+  USE input_parameters, ONLY : nat_ => nat, ntyp_ => ntyp
+  USE input_parameters, ONLY : assume_isolated_ => assume_isolated, &
+                               ibrav_ => ibrav
+  USE ions_base,        ONLY : nat, ntyp => nsp
+  USE cell_base,        ONLY : ibrav
   USE tddft_version
   USE iotk_module  
   USE xml_io_base
   !------------------------------------------------------------------------
   IMPLICIT NONE
-  CHARACTER (LEN=9)   :: code = 'QE'
+  CHARACTER (LEN=9)   :: code = 'TDDFT'
+  CHARACTER (LEN=10)  :: dirname = 'dummy'
   LOGICAL, EXTERNAL  :: check_para_diag
   !------------------------------------------------------------------------
 
@@ -46,24 +59,28 @@ PROGRAM tddft_main
 #endif
   call environment_start (code)
 
+  ! read plugin command line arguments, if any
+  if (meta_ionode) call plugin_arguments()
+  call plugin_arguments_bcast( meta_ionode_id, world_comm )
+
 #ifndef __BANDS
   if (nbgrp > 1) &
     call errore('tddft_main', 'configure and recompile TDDFT with --enable-band-parallel', 1)
 #endif
 
   write(stdout,*)
-  write(stdout,'(5X,''***** This is TDDFT svn revision '',A,'' *****'')') tddft_svn_revision
+  write(stdout,'(5X,''***** This is TDDFT git revision '',A,'' *****'')') tddft_git_revision
+  write(stdout,'(5X,''***** you can cite: X. Qian et al. Phys. Rev. B 73, 035408 (2006)         *****'')')
+  write(stdout,'(5X,''***** in publications or presentations arising from this work.            *****'')')
   write(stdout,*)
 
-  call start_clock('PWSCF')
   call tddft_readin()
-  call check_stop_init()
+  call check_stop_init( max_seconds )
 
   io_level = 1
  
   ! read ground state wavefunctions
   call read_file
-
 #ifdef __MPI
   use_para_diag = check_para_diag(nbnd)
 #else
@@ -81,6 +98,11 @@ PROGRAM tddft_main
 #endif
   if (noncolin) call errore('tdddft_main', 'non-collinear not supported yet', 1)
 
+  nat_ = nat
+  ntyp_ = ntyp
+  ibrav_ = ibrav
+  assume_isolated_ = 'none'
+  call plugin_read_input()
   call tddft_allocate()
   call tddft_setup()
   call tddft_summary()
@@ -105,9 +127,9 @@ PROGRAM tddft_main
   
   ! print timings and stop the code
   call tddft_closefil
-  call print_clock_tddft()
-  call stop_run(tddft_exit_code)
-  call do_stop(tddft_exit_code)
+  call print_clock_tddft
+  call environment_end(code)
+  call stop_code( .true. )
   
   STOP
   

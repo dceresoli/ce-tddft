@@ -18,7 +18,6 @@ SUBROUTINE tddft_readin()
   USE io_files,         ONLY : nd_nmbr, prefix, tmp_dir  
   USE io_global,        ONLY : ionode, stdout
   USE constants,        ONLY : bohr_radius_angs, au_sec
-  USE input_parameters, ONLY : max_seconds
   USE mp_images,        ONLY : my_image_id
 
   ! -- local variables ---------------------------------------------------
@@ -96,7 +95,6 @@ SUBROUTINE tddft_bcast_input
   USE mp,            ONLY : mp_bcast
   USE io_files,      ONLY : prefix, tmp_dir
   USE tddft_module
-  USE input_parameters, ONLY : max_seconds
 
   implicit none
   integer, parameter :: root = 0    
