@@ -1,6 +1,11 @@
 # CE-TDDFT
 This is a real time TDDFT code for Quantum-Espresso.
 
+### News
+* Nov 26, 2018: ce-tddft is now compatible with QE-6.3
+* Jul 17, 2017: ce-tddft is now compatible with QE-6.1
+
+
 ## Features
 * NMR shielding tensors, EFG tensors
 * EPR g-tensor, hyperfine couplings
@@ -29,10 +34,6 @@ not available yet!
 
 ### Source releases
 Official source releases are found [here](https://github.com/dceresoli/ce-tddft/releases).
-
-
-### News
-* Jul 17, 2017: ce-tddft is now compatible with QE-6.1
 
 ### TODO
 - Ehrenfest dynamics
