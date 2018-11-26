@@ -20,15 +20,14 @@ subroutine molecule_optical_absorption
   USE io_files,                    ONLY : nwordwfc, iunwfc
   USE ions_base,                   ONLY : nat, ntyp => nsp, ityp
   USE cell_base,                   ONLY : at, bg, omega, tpiba, tpiba2, alat
-  USE wavefunctions_module,        ONLY : evc
+  USE wavefunctions,               ONLY : evc
   USE klist,                       ONLY : nks, nkstot, wk, xk, nelec, ngk, igk_k
-  USE wvfct,                       ONLY : nbnd, npwx, npw, wg, g2kin, current_k
+  USE wvfct,                       ONLY : nbnd, npwx, wg, g2kin, current_k
   USE lsda_mod,                    ONLY : current_spin, lsda, isk, nspin
-  USE becmod,                      ONLY : becp  
+  USE becmod,                      ONLY : becp, calbec, allocate_bec_type
   USE mp_pools,                    ONLY : my_pool_id, inter_pool_comm, intra_pool_comm
   USE mp,                          ONLY : mp_sum, mp_barrier
   USE gvect,                       ONLY : ngm, g
-  USE gvecs,                       ONLY : nls
   USE fft_base,                    ONLY : dfftp, dffts
   USE buffers,                     ONLY : get_buffer, save_buffer
   USE fixed_occ,                   ONLY : tfixed_occ 
@@ -48,7 +47,7 @@ subroutine molecule_optical_absorption
   complex(dp), allocatable :: circular(:,:), circular_local(:)
 
   integer :: istep, lter, flag_global
-  integer :: ik, is, ibnd
+  integer :: ik, is, ibnd, npw
   complex(dp) :: ee                     ! i*dt/2
   real(dp) :: anorm
   integer, external :: find_free_unit
@@ -77,7 +76,8 @@ subroutine molecule_optical_absorption
      do ik = 1, nks
         current_k = ik
         current_spin = isk(ik)
-        
+        npw = ngk(ik)
+ 
         ! initialize at k-point k
         call g2_kin(ik)
         call init_us_2(npw, igk_k(1,ik), xk(1,ik), vkb)
@@ -104,11 +104,12 @@ subroutine molecule_optical_absorption
     do ik = 1, nks
       current_k = ik
       current_spin = isk(ik)
-        
+      npw = ngk(ik)
+ 
       ! initialize at k-point k
       call g2_kin(ik)
       call init_us_2(npw, igk_k(1,ik), xk(1,ik), vkb)
-        
+      
       ! read wfcs from file and compute becp
       evc = (0.d0, 0.d0)
       if (istep == 1) then
@@ -116,6 +117,7 @@ subroutine molecule_optical_absorption
       else
         call get_buffer (evc, nwordwfc, iunevcn, ik)
       endif
+      call calbec( npw, vkb, evc, becp )
       if ( (istep > 1) .or. (l_tddft_restart .and. (istep == 1)) ) then
         call get_buffer (tddft_psi, nwordtdwfc, iuntdwfc, ik)
       endif
@@ -141,7 +143,7 @@ subroutine molecule_optical_absorption
       ! calculate H |psi_current>, S |psi_current>
       call h_psi(npwx, npw, nbnd_occ(ik), evc, tddft_hpsi)
       call s_psi(npwx, npw, nbnd_occ(ik), evc, tddft_spsi)
-        
+              
       ! calculate (S - H*dt*i/2) |\psi_current>
       b(1:npw, 1:nbnd_occ(ik)) = tddft_spsi(1:npw,1:nbnd_occ(ik)) - ee * tddft_hpsi(1:npw,1:nbnd_occ(ik))
         
@@ -183,6 +185,7 @@ subroutine molecule_optical_absorption
     flush(stdout)
      
   enddo      ! end of TDDFT loop
+  write(stdout,*)
 
   ! finish  
   call tddft_cgsolver_finalize()
@@ -267,44 +270,42 @@ CONTAINS
     USE mp_global,              ONLY : me_pool
     IMPLICIT NONE
     REAL(DP) :: xx(dfftp%nnr), yy(dfftp%nnr), zz(dfftp%nnr), gk
-    INTEGER  :: ik, ibnd, i, ii, jj, kk, index0, index, ir, ipol, ind, i_current_spin, ig
+    INTEGER  :: ik, ibnd, i, j, k, j0, k0, idx, ir, ipol, ind, i_current_spin, ig
     complex(dp) :: p_psi(npwx), p_psi_r(dfftp%nnr, 3), cd(3, nspin), psic1(dfftp%nnr)
     
     xx(:) = 0.d0
     yy(:) = 0.d0
     zz(:) = 0.d0
     
-    index0 = 0
-
-#ifdef __MPI
-  do i = 1, me_pool
-    index0 = index0 + dfftp%nr1x*dfftp%nr2x*dfftp%npp(i)
-  enddo
-#endif
-
-  ! loop over real space grid
-  do ir = 1, dfftp%nnr
-    index = index0 + ir - 1
-    kk     = index / (dfftp%nr1x*dfftp%nr2x)
-    index = index - (dfftp%nr1x*dfftp%nr2x)*kk
-    jj     = index / dfftp%nr1x
-    index = index - dfftp%nr1x*jj
-    ii     = index
+    ! Loop in the charge array
+    j0 = dfftp%my_i0r2p ; k0 = dfftp%my_i0r3p
+    DO ir = 1, dfftp%nr1x*dfftp%my_nr2p*dfftp%my_nr3p
+       !
+       ! ... three dimensional indexes
+       !
+       idx = ir -1
+       k   = idx / (dfftp%nr1x*dfftp%my_nr2p)
+       idx = idx - (dfftp%nr1x*dfftp%my_nr2p)*k
+       k   = k + k0
+       j   = idx / dfftp%nr1x
+       idx = idx - dfftp%nr1x * j
+       j   = j + j0
+       i   = idx
 
              xx(ir) = &
-                  dble( ii-1 )/dble(dfftp%nr1) * at(1,1) * alat + &
-                  dble( jj-1 )/dble(dfftp%nr2) * at(1,2) * alat + &
-                  dble( kk-1 )/dble(dfftp%nr3) * at(1,3) * alat
+                  dble( i-1 )/dble(dfftp%nr1) * at(1,1) * alat + &
+                  dble( j-1 )/dble(dfftp%nr2) * at(1,2) * alat + &
+                  dble( k-1 )/dble(dfftp%nr3) * at(1,3) * alat
              
              yy(ir) = &
-                  dble( ii-1 )/dble(dfftp%nr1) * at(2,1) * alat + &
-                  dble( jj-1 )/dble(dfftp%nr2) * at(2,2) * alat + &
-                  dble( kk-1 )/dble(dfftp%nr3) * at(2,3) * alat
+                  dble( i-1 )/dble(dfftp%nr1) * at(2,1) * alat + &
+                  dble( j-1 )/dble(dfftp%nr2) * at(2,2) * alat + &
+                  dble( k-1 )/dble(dfftp%nr3) * at(2,3) * alat
              
              zz(ir) = &
-                  dble( ii-1 )/dble(dfftp%nr1) * at(3,1) * alat + &
-                  dble( jj-1 )/dble(dfftp%nr2) * at(3,2) * alat + &
-                  dble( kk-1 )/dble(dfftp%nr3) * at(3,3) * alat
+                  dble( i-1 )/dble(dfftp%nr1) * at(3,1) * alat + &
+                  dble( j-1 )/dble(dfftp%nr2) * at(3,2) * alat + &
+                  dble( k-1 )/dble(dfftp%nr3) * at(3,3) * alat
              
     end do
     
@@ -326,14 +327,14 @@ CONTAINS
                 p_psi(ig) = gk * tpiba * tddft_psi(ig, ibnd, ik)
              end do
              psic1(:) = (0.d0, 0.d0)
-             psic1(nls(igk_k(1:npw,ik))) = p_psi(:)
+             psic1(dffts%nl(igk_k(1:npw,ik))) = p_psi(:)
              call invfft('Wave', psic1, dfftp)
              p_psi_r(:,ipol) = psic1(:)
           end do
           
           ! transform wavefunction from reciprocal space into real space
           psic1(:) = (0.d0, 0.d0)
-          psic1(nls(igk_k(1:npw,ik))) = tddft_psi(1:npw, ibnd, ik)
+          psic1(dffts%nl(igk_k(1:npw,ik))) = tddft_psi(1:npw, ibnd, ik)
           call invfft('Wave', psic1, dfftp)
           
           do ind = 1, dfftp%nnr

@@ -43,7 +43,6 @@ PROGRAM tddft_main
   USE cell_base,        ONLY : ibrav
   USE tddft_version
   USE iotk_module  
-  USE xml_io_base
   !------------------------------------------------------------------------
   IMPLICIT NONE
   CHARACTER (LEN=9)   :: code = 'TDDFT'

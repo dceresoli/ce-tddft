@@ -1,5 +1,5 @@
 # Autoconf template for ce-tddft
-AC_INIT(ce-tddft, 6.2, dceresoli@gmail.com, ce-tddft)
+AC_INIT(ce-tddft, 6.3, dceresoli@gmail.com, ce-tddft)
 
 # Option: Quantum-Espresso source directory (QE_SOURCE)
 AC_ARG_WITH(qe-source,
@@ -28,7 +28,7 @@ AC_MSG_CHECKING([Quantum-Espresso version])
 version=`grep version_number ${qe_source}/Modules/version.f90 | cut -d\' -f2`
 AC_MSG_RESULT([$version])
 case $version in
-  6.2*   ) ;;
+  6.3*   ) ;;
   *) AC_MSG_ERROR([Cannot compile against this version of Quantum-Espresso]) ;;
 esac
 

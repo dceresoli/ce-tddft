@@ -25,7 +25,7 @@ SUBROUTINE molecule_setup_r
   real(dp) :: zvtot, x0(3), r(3)
   real(dp) :: inv_nr1, inv_nr2, inv_nr3
   real(dp) :: inv_nr1s, inv_nr2s, inv_nr3s
-  integer :: ia, i, j, k, index0, ir, ir_end, ipol
+  integer :: ia, i, j, k, j0, k0, idx, ir, ir_end, ipol
 
   ! calculate the center of charge
   zvtot = 0.d0
@@ -41,21 +41,20 @@ SUBROUTINE molecule_setup_r
   inv_nr2 = 1.d0 / real(dfftp%nr2,dp)
   inv_nr3 = 1.d0 / real(dfftp%nr3,dp)
 
-#if defined (__MPI)
-  index0 = dfftp%nr1x*dfftp%nr2x*SUM(dfftp%npp(1:me_bgrp))
-  ir_end = MIN(dfftp%nnr,dfftp%nr1x*dfftp%nr2x*dfftp%npp(me_bgrp+1))
-#else
-  index0 = 0
-  ir_end = dfftp%nnr
-#endif
-
-  ! loop over real space grid
-  do ir = 1, ir_end
-    i     = index0 + ir - 1
-    k     = i / (dfftp%nr1x*dfftp%nr2x)
-    i     = i     - (dfftp%nr1x*dfftp%nr2x)*k
-    j     = i     / dfftp%nr1x
-    i     = i     - dfftp%nr1x*j
+  ! Loop in the charge array
+  j0 = dfftp%my_i0r2p ; k0 = dfftp%my_i0r3p
+  DO ir = 1, dfftp%nr1x*dfftp%my_nr2p*dfftp%my_nr3p
+    !
+    ! ... three dimensional indexes
+    !
+    idx = ir -1
+    k   = idx / (dfftp%nr1x*dfftp%my_nr2p)
+    idx = idx - (dfftp%nr1x*dfftp%my_nr2p)*k
+    k   = k + k0
+    j   = idx / dfftp%nr1x
+    idx = idx - dfftp%nr1x * j
+    j   = j + j0
+    i   = idx
 
     do ipol = 1, 3
       r(ipol) = real(i,dp)*inv_nr1*at(ipol,1) + &
@@ -77,21 +76,21 @@ SUBROUTINE molecule_setup_r
   inv_nr2s = 1.d0 / real(dffts%nr2,dp)
   inv_nr3s = 1.d0 / real(dffts%nr3,dp)
 
-#if defined (__MPI)
-  index0 = dffts%nr1x*dffts%nr2x*SUM(dffts%npp(1:me_bgrp))
-  ir_end = MIN(dffts%nnr,dffts%nr1x*dffts%nr2x*dffts%npp(me_bgrp+1))
-#else
-  index0 = 0
-  ir_end = dffts%nnr
-#endif
 
-  ! loop over real space grid
-  do ir = 1, ir_end
-    i     = index0 + ir - 1
-    k     = i / (dffts%nr1x*dffts%nr2x)
-    i     = i - (dffts%nr1x*dffts%nr2x)*k
-    j     = i / dffts%nr1x
-    i     = i - dffts%nr1x*j
+  ! Loop in the charge array
+  j0 = dffts%my_i0r2p ; k0 = dffts%my_i0r3p
+  DO ir = 1, dffts%nr1x*dffts%my_nr2p*dffts%my_nr3p
+    !
+    ! ... three dimensional indexes
+    !
+    idx = ir -1
+    k   = idx / (dffts%nr1x*dffts%my_nr2p)
+    idx = idx - (dffts%nr1x*dffts%my_nr2p)*k
+    k   = k + k0
+    j   = idx / dffts%nr1x
+    idx = idx - dffts%nr1x * j
+    j   = j + j0
+    i   = idx
 
     do ipol = 1, 3
       r(ipol) = real(i,dp)*inv_nr1s*at(ipol,1) + &

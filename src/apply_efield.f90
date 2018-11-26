@@ -19,28 +19,28 @@ SUBROUTINE apply_electric_field(tddft_psi)
   USE fft_base,     ONLY : dffts
   USE ions_base,    ONLY : nat, tau, ityp, zv
   USE cell_base,    ONLY : at, bg, alat
-  USE gvecs,        ONLY : nls
-  USE wvfct,        ONLY : current_k, npw, npwx, nbnd
-  USE klist,        ONLY : igk_k
+  USE wvfct,        ONLY : current_k, npwx, nbnd
+  USE klist,        ONLY : igk_k, ngk
   USE io_files,     ONLY : nwordwfc, iunwfc
   USE buffers,      ONLY : save_buffer
-  USE wavefunctions_module, ONLY : evc
+  USE wavefunctions,  ONLY : evc
   USE fft_base,       ONLY : dffts
   USE fft_interfaces, ONLY : invfft, fwfft
   USE tddft_module
   implicit none
 
   complex(dp), intent(out) :: tddft_psi(npwx,nbnd)
-  integer :: ik, ibnd, ir
+  integer :: ik, ibnd, ir, npw
   complex(dp) :: psic(dffts%nnr)
   real(dp) :: phase 
   
   ik = current_k
+  npw = ngk(ik)
 
   do ibnd = 1, nbnd_occ(ik)
     ! transform wavefunction from reciprocal space into real space
     psic = (0.d0, 0.d0)
-    psic(nls(igk_k(1:npw,ik))) = evc(1:npw, ibnd)
+    psic(dffts%nl(igk_k(1:npw,ik))) = evc(1:npw, ibnd)
     call invfft ('Wave', psic, dffts)  
 
     do ir = 1, dffts%nnr
@@ -50,7 +50,7 @@ SUBROUTINE apply_electric_field(tddft_psi)
 
     call fwfft ('Wave', psic, dffts)  
        
-    evc(1:npw,ibnd) = psic(nls(igk_k(1:npw,ik)))
+    evc(1:npw,ibnd) = psic(dffts%nl(igk_k(1:npw,ik)))
   enddo
   
   call save_buffer (evc, nwordwfc, iunevcn, ik)

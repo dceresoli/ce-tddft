@@ -1,29 +1,28 @@
 
-     Program TDDFT v.6.3 starts on 26Nov2018 at 12:41:12 
+     Program QE v.6.1 (svn rev. 13369) starts on  7Nov2017 at 17: 1:53 
 
      This program is part of the open-source Quantum ESPRESSO suite
      for quantum simulation of materials; please cite
          "P. Giannozzi et al., J. Phys.:Condens. Matter 21 395502 (2009);
-         "P. Giannozzi et al., J. Phys.:Condens. Matter 29 465901 (2017);
           URL http://www.quantum-espresso.org", 
      in publications or presentations arising from this work. More details at
      http://www.quantum-espresso.org/quote
 
      Parallel version (MPI), running on     4 processors
-
-     MPI processes distributed on     1 nodes
      R & G space division:  proc/nbgrp/npool/nimage =       4
  
-     ***** This is TDDFT git revision b8dfc15f868fb711f7b8a87731402da51c028e1b *****
-     ***** you can cite: X. Qian et al. Phys. Rev. B 73, 035408 (2006)         *****
-     ***** in publications or presentations arising from this work.            *****
+     ***** This is TDDFT svn revision unknown      *****
  
 
      Reading data from directory:
-     ./scratch/c6h6.save/
+     ./scratch/c6h6.save
+
+   Info: using nr1, nr2, nr3 values from input
+
+   Info: using nr1, nr2, nr3 values from input
 
      IMPORTANT: XC functional enforced from input :
-     Exchange-correlation      = PZ ( 1  1  0  0 0 0)
+     Exchange-correlation      =  SLA  PZ   NOGX NOGC ( 1  1  0  0 0 0)
      Any further DFT definition will be discarded
      Please, verify this is what you really want
 
@@ -1530,7 +1529,7 @@ DIP    1    736   -0.832095E-03   -0.320919E-03    0.733541E-02
 CHARGE 1    737    0.300000E+02
 DIP    1    737   -0.832102E-03   -0.320941E-03    0.700393E-02
 CHARGE 1    738    0.300000E+02
-DIP    1    738   -0.832160E-03   -0.320912E-03    0.665113E-02
+DIP    1    738   -0.832159E-03   -0.320912E-03    0.665113E-02
 CHARGE 1    739    0.300000E+02
 DIP    1    739   -0.832286E-03   -0.320842E-03    0.627396E-02
 CHARGE 1    740    0.300000E+02
@@ -6782,7 +6781,7 @@ DIP    1   3362   -0.835948E-03   -0.339713E-03    0.822518E-03
 CHARGE 1   3363    0.300000E+02
 DIP    1   3363   -0.835768E-03   -0.339564E-03    0.422860E-03
 CHARGE 1   3364    0.300000E+02
-DIP    1   3364   -0.835617E-03   -0.339437E-03    0.414586E-04
+DIP    1   3364   -0.835617E-03   -0.339437E-03    0.414587E-04
 CHARGE 1   3365    0.300000E+02
 DIP    1   3365   -0.835552E-03   -0.339318E-03   -0.317163E-03
 CHARGE 1   3366    0.300000E+02
@@ -10055,33 +10054,59 @@ CHARGE 1   4999    0.300000E+02
 DIP    1   4999   -0.843607E-03   -0.339849E-03    0.197053E-03
 CHARGE 1   5000    0.300000E+02
 DIP    1   5000   -0.843428E-03   -0.339510E-03    0.626901E-03
- 
      Initialization:
      tddft_setup  :      0.00s CPU      0.01s WALL (       1 calls)
  
      Linear response
-     ch_psi       :   1111.17s CPU   1140.58s WALL (  450045 calls)
-     h_psi        :   1237.85s CPU   1274.38s WALL (  455045 calls)
+     ch_psi       :  13493.20s CPU  27574.69s WALL (  450045 calls)
+     h_psi        :  15469.33s CPU  31633.80s WALL (  455045 calls)
      Real time evolution
-     updateH      :    157.18s CPU    166.48s WALL (    5000 calls)
-     dipole       :      4.19s CPU      4.44s WALL (    5000 calls)
+     updateH      :   1561.82s CPU   3188.71s WALL (    5000 calls)
+     dipole       :     65.14s CPU    134.86s WALL (    5000 calls)
  
      General routines
-     calbec       :     66.39s CPU     68.46s WALL (  460045 calls)
-     fft          :     20.16s CPU     20.75s WALL (   10005 calls)
-     ffts         :      8.93s CPU      9.32s WALL (    5000 calls)
-     fftw         :    914.03s CPU    942.19s WALL ( 1125120 calls)
-     davcio       :     10.16s CPU     14.10s WALL (   20001 calls)
+     calbec       :   2310.78s CPU   4806.99s WALL (  455045 calls)
+     fft          :    373.50s CPU    760.28s WALL (   15004 calls)
+     fftw         :  13958.27s CPU  28566.34s WALL ( 1125120 calls)
+     davcio       :      8.38s CPU     16.58s WALL (   20000 calls)
  
      Parallel routines
+     fft_scatter  :  13580.36s CPU  28136.47s WALL ( 1140124 calls)
  
-     TDDFT        :  25m 2.64s CPU  25m58.23s WALL
+ 
 
- 
-     TDDFT        :  25m 2.64s CPU  25m58.23s WALL
+     Called by init_run:
 
+     Called by electrons:
+     sum_band     :   1298.14s CPU   2654.81s WALL (    5000 calls)
+     v_of_rho     :    262.23s CPU    531.44s WALL (    5001 calls)
+
+     Called by c_bands:
+     init_us_2    :      3.52s CPU      5.57s WALL (   10000 calls)
+
+     Called by sum_band:
+
+     Called by *egterg:
+     h_psi        :  15469.33s CPU  31633.80s WALL (  455045 calls)
+
+     Called by h_psi:
+     h_psi:pot    :  15458.08s CPU  31614.97s WALL (  455045 calls)
+     h_psi:calbec :   2311.59s CPU   4807.99s WALL (  455045 calls)
+     vloc_psi     :  13107.86s CPU  26745.17s WALL (  455045 calls)
+     add_vuspsi   :     37.18s CPU     59.86s WALL (  455045 calls)
+
+     General routines
+     calbec       :   2310.78s CPU   4806.99s WALL (  455045 calls)
+     fft          :    373.50s CPU    760.28s WALL (   15004 calls)
+     fftw         :  13958.27s CPU  28566.34s WALL ( 1125120 calls)
+     davcio       :      8.38s CPU     16.58s WALL (   20000 calls)
  
-   This run was terminated on:  13: 7:11  26Nov2018            
+     Parallel routines
+     fft_scatter  :  13580.36s CPU  28136.47s WALL ( 1140124 calls)
+ 
+     PWSCF        :  19595.50s CPU  40100.18s WALL (       1 calls)
+ 
+   This run was terminated on:   4:10:14   8Nov2017            
 
 =------------------------------------------------------------------------------=
    JOB DONE.

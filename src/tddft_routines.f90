@@ -25,7 +25,7 @@ SUBROUTINE tddft_readin()
   integer :: ios
   character(len=256), external :: trimcheck
   character(len=80) :: verbosity
-  namelist /inputtddft/ job, prefix, tmp_dir, conv_threshold, iverbosity, &
+  namelist /inputtddft/ job, prefix, tmp_dir, conv_threshold, verbosity, &
                         dt, e_strength, e_direction, nstep, nupdate_Dnm, &
                         l_circular_dichroism, l_tddft_restart, max_seconds, &
                         molecule

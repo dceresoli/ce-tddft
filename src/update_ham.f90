@@ -24,6 +24,7 @@ SUBROUTINE update_hamiltonian(istep)
   USE tddft_module,  ONLY : nupdate_Dnm, iverbosity
   USE becmod,        ONLY : becp, allocate_bec_type, deallocate_bec_type
   USE wvfct,         ONLY : nbnd
+  USE scf,           ONLY : rho
   implicit none
   integer, intent(in) :: istep
   real(dp) :: charge, ehart, etxc, vtxc, eth, etotefield
@@ -32,6 +33,8 @@ SUBROUTINE update_hamiltonian(istep)
   
   ! calculate total charge density
   call deallocate_bec_type(becp)
+  rho%of_g(:,:) = (0.d0,0.d0)
+  rho%of_r(:,:) = 0.d0
   call sum_band()
   call allocate_bec_type(nkb, nbnd, becp)
 
