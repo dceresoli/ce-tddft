@@ -23,7 +23,7 @@ SUBROUTINE apply_electric_field(tddft_psi)
   USE klist,        ONLY : igk_k, ngk
   USE io_files,     ONLY : nwordwfc, iunwfc
   USE buffers,      ONLY : save_buffer
-  USE wavefunctions,  ONLY : evc
+  USE wavefunctions_module,  ONLY : evc
   USE fft_base,       ONLY : dffts
   USE fft_interfaces, ONLY : invfft, fwfft
   USE tddft_module

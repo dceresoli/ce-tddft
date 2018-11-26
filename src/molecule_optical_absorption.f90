@@ -20,7 +20,7 @@ subroutine molecule_optical_absorption
   USE io_files,                    ONLY : nwordwfc, iunwfc
   USE ions_base,                   ONLY : nat, ntyp => nsp, ityp
   USE cell_base,                   ONLY : at, bg, omega, tpiba, tpiba2, alat
-  USE wavefunctions,               ONLY : evc
+  USE wavefunctions_module,        ONLY : evc
   USE klist,                       ONLY : nks, nkstot, wk, xk, nelec, ngk, igk_k
   USE wvfct,                       ONLY : nbnd, npwx, wg, g2kin, current_k
   USE lsda_mod,                    ONLY : current_spin, lsda, isk, nspin
