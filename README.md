@@ -7,17 +7,12 @@ This is a real time TDDFT code for Quantum-Espresso.
 
 
 ## Features
-* NMR shielding tensors, EFG tensors
-* EPR g-tensor, hyperfine couplings
-* Mössbauer
-* Norm-conserving (g-tensor only), USPP and PAW
-* LDA and GGA functionals
-* isolated and periodic systems
-* integration with Quantum-Environment (solvent effects)
+* Optical absorption spectrum of molecules
+* Ehrenfest dynamics, norm-conserving only
 
 
 ## Authors and contributors
-D. Ceresoli, X. Qian
+D. Ceresoli, X. Qian, A. Genova, A. Krisihtal, M. Pavanello
 
 
 ## Build instructions:
@@ -36,7 +31,7 @@ not available yet!
 Official source releases are found [here](https://github.com/dceresoli/ce-tddft/releases).
 
 ### TODO
-- Ehrenfest dynamics
+- Ehrenfest dynamics with USPP and PAW pseudos
 - arbitrary pulses
 - improve performance of NL-terms in circular dichroism
 - restart/checkpointing
