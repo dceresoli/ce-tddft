@@ -22,8 +22,6 @@ SUBROUTINE sum_energies
   implicit none
   real(dp) :: eext = 0.d0
 
-  etot = eband + ( etxc - etxcc ) + ewld + ehart
-
   if (okpaw) etot = etot + epaw
   if (lda_plus_u) etot = etot + eth
 
@@ -57,7 +55,6 @@ SUBROUTINE sum_energies
 !-----------------------------------------------------------------------
 END SUBROUTINE sum_energies
 !-----------------------------------------------------------------------
-
 
 
 !-----------------------------------------------------------------------

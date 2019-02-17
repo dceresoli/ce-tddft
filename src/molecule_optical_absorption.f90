@@ -188,7 +188,7 @@ subroutine molecule_optical_absorption
     ! print observables
     if (ionode) then
       do is = 1, nspin
-        write(stdout,'(''ETOT   '','' '',1X,I6,E16.6)') istep, etot
+        write(stdout,'(''ENERGY '',2X,I6,5F16.10)') istep, etot, eband, ehart, etxc, ewld
         write(stdout,'(''CHARGE '',I1,1X,I6,3E16.6)') is, istep, charge(is)
         write(stdout,'(''DIP    '',I1,1X,I6,3E16.6)') is, istep, dipole(:,is)
         !write(stdout,'(''QUAD   '',I1,1X,I6,9E18.9)') is, istep, quadrupole(:,:,is)
@@ -223,7 +223,7 @@ CONTAINS
   !====================================================================    
   SUBROUTINE print_legend
     write(stdout,'(5X,''Output quantities:'')')
-    write(stdout,'(5X,''  ETOT         istep  total_energy'')')
+    write(stdout,'(5X,''  ENERGY istep etot eband ehart etxc ewld'')')
     write(stdout,'(5X,''  CHARGE spin  istep  charge'')')
     write(stdout,'(5X,''  DIP    spin  istep  dipole(1:3)'')')
     !write(stdout,'(5X,''  QUAD   spin  istep  quadrupole(1:3,1:3)'')')
