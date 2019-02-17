@@ -2,6 +2,7 @@
 This is a real time TDDFT code for Quantum-Espresso.
 
 ### News
+* Feb 17, 2019: Ehrenfest dynamics implemented
 * Nov 26, 2018: ce-tddft is now compatible with QE-6.3
 * Jul 17, 2017: ce-tddft is now compatible with QE-6.1
 

@@ -1,0 +1,9 @@
+&inputtddft
+    job            = 'optical'
+    prefix         = 'h2'
+    tmp_dir        = './scratch/'
+    dt             = 1.0
+    nstep          = 10000
+    conv_threshold = 1e-14
+    ehrenfest      = .true.
+/
