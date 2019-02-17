@@ -23,7 +23,7 @@ PROGRAM tddft_main
   USE cell_base,       ONLY : tpiba
   USE tddft_module,    ONLY : job, molecule, max_seconds, tddft_exit_code
   USE check_stop,      ONLY : check_stop_init
-  USE control_flags,   ONLY : io_level, gamma_only, use_para_diag, twfcollect
+  USE control_flags,   ONLY : io_level, gamma_only, use_para_diag
   USE mp_global,       ONLY : mp_startup, nproc_pool_file
   USE mp_bands,        ONLY : nbgrp
   USE mp_pools,        ONLY : nproc_pool
@@ -89,8 +89,6 @@ PROGRAM tddft_main
   call tddft_openfil
 
   if (gamma_only) call errore ('tdddft_main', 'Cannot run TDFFT with gamma_only == .true. ', 1)
-  if ((twfcollect .eqv. .false.)  .and. (nproc_pool_file /= nproc_pool)) &
-    call errore('tddft_main', 'Different number of CPU/pool. Set wf_collect=.true. in SCF', 1)
 #ifdef __BANDS
   if (nbgrp > 1 .and. (twfcollect .eqv. .false.)) &
     call errore('tddft_main', 'Cannot use band-parallelization without wf_collect in SCF', 1)
