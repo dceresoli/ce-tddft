@@ -28,7 +28,7 @@ SUBROUTINE tddft_readin()
   namelist /inputtddft/ job, prefix, tmp_dir, conv_threshold, verbosity, &
                         dt, e_strength, e_direction, nstep, nupdate_Dnm, &
                         l_circular_dichroism, l_tddft_restart, max_seconds, &
-                        molecule
+                        molecule, ehrenfest
 
   if (.not. ionode .or. my_image_id > 0) goto 400
 
@@ -52,6 +52,7 @@ SUBROUTINE tddft_readin()
   l_tddft_restart      = .false.
   max_seconds  =  1.d7
   molecule     = .true.
+  ehrenfest    = .false.
 
   ! read input    
   read( 5, inputtddft, err = 200, iostat = ios )
@@ -113,6 +114,7 @@ SUBROUTINE tddft_bcast_input
   call mp_bcast(iverbosity, root, world_comm)
   call mp_bcast(max_seconds, root, world_comm)
   call mp_bcast(molecule, root, world_comm)
+  call mp_bcast(ehrenfest, root, world_comm)
 
 END SUBROUTINE tddft_bcast_input
 #endif
@@ -144,17 +146,27 @@ SUBROUTINE tddft_summary
   !
   ! ... Print a short summary of the calculation
   !
+  USE io_global,        ONLY : stdout
+  USE lsda_mod,         ONLY : nspin
+  USE wvfct,            ONLY : nbnd
+  USE paw_variables,    ONLY : okpaw
+  USE uspp,             ONLY : okvan
+  USE error_handler,    ONLY : warning
   USE tddft_module
-  USE io_global,     ONLY : stdout
   implicit none
-  
+  integer :: is
+ 
   write(stdout,*)
 
   write(stdout,'(5X,''Calculation type      : '',A12)') job
   if (molecule) then
-     write(stdout,'(5X,''Systme is             : molecule'')')
+     write(stdout,'(5X,''System is             : molecule'')')
   else
-     write(stdout,'(5X,''Systme is             : crystal'')')
+     write(stdout,'(5X,''System is             : crystal'')')
+  endif
+  if (ehrenfest) then
+     write(stdout,'(5X,''Ehrenfest dynamics'')')
+     if (okpaw .or. okvan) call warning('Ehrenfest dynamics not yet supported with USPP and PAW')
   endif
   write(stdout,'(5X,''Number or steps       : '',I12)') nstep
   write(stdout,'(5X,''Time step             : '',F12.4,'' rydberg_atomic_time'')') dt
@@ -163,7 +175,16 @@ SUBROUTINE tddft_summary
 
   write(stdout,*)
 
-  flush(stdout)
+  if (tfixed_occ) then
+     write(stdout,'(5X,''Occupations from input:'')')
+     do is = 1, nspin
+       write(stdout,'(5X,''ispin='',I1,'': '')',advance='no') is
+       write(stdout,'(10(F5.2,2X))') f_inp(1:nbnd,is)
+     enddo
+    write(stdout,*)
+  endif
+     
+  flush( stdout )
 
 END SUBROUTINE tddft_summary
   

@@ -1,5 +1,5 @@
 !
-! Copyright (C) 2001-2014 Quantum-ESPRESSO group
+! Copyright (C) 2001-2019 Quantum-ESPRESSO group
 ! This file is distributed under the terms of the
 ! GNU General Public License. See the file `License'
 ! in the root directory of the present distribution,
@@ -18,13 +18,14 @@ subroutine molecule_optical_absorption
   USE kinds,                       ONLY : dp
   USE io_global,                   ONLY : stdout, ionode
   USE io_files,                    ONLY : nwordwfc, iunwfc
-  USE ions_base,                   ONLY : nat, ntyp => nsp, ityp
+  USE ions_base,                   ONLY : nat, ntyp => nsp, ityp, if_pos
   USE cell_base,                   ONLY : at, bg, omega, tpiba, tpiba2, alat
   USE wavefunctions,               ONLY : evc
   USE klist,                       ONLY : nks, nkstot, wk, xk, nelec, ngk, igk_k
   USE wvfct,                       ONLY : nbnd, npwx, wg, g2kin, current_k
   USE lsda_mod,                    ONLY : current_spin, lsda, isk, nspin
-  USE becmod,                      ONLY : becp, calbec, allocate_bec_type
+  USE becmod,                      ONLY : becp, calbec, allocate_bec_type, &
+                                          is_allocated_bec_type, deallocate_bec_type
   USE mp_pools,                    ONLY : my_pool_id, inter_pool_comm, intra_pool_comm
   USE mp,                          ONLY : mp_sum, mp_barrier
   USE gvect,                       ONLY : ngm, g
@@ -36,6 +37,9 @@ subroutine molecule_optical_absorption
   USE uspp_param,                  ONLY : nh
   USE scf,                         ONLY : rho, rho_core, rhog_core, vltot, v, vrs
   USE control_flags,               ONLY : tqr
+  USE dynamics_module,             ONLY : vel, verlet, allocate_dyn_vars, deallocate_dyn_vars
+  USE dynamics_module,             ONLY : ions_dt => dt
+  USE pwcom
   USE tddft_module
 
   IMPLICIT NONE
@@ -43,11 +47,12 @@ subroutine molecule_optical_absorption
   !-- tddft variables ----------------------------------------------------
   complex(dp), allocatable :: tddft_psi(:,:,:), b(:,:)
   complex(dp), allocatable :: tddft_hpsi(:,:), tddft_spsi(:,:)
+  complex(dp), allocatable :: tddft_Ppsi(:,:)        ! PAW correction to forces (Ehrenfest)
   real(dp), allocatable :: charge(:), dipole(:,:), quadrupole(:,:,:)
   complex(dp), allocatable :: circular(:,:), circular_local(:)
 
   integer :: istep, lter, flag_global
-  integer :: ik, is, ibnd, npw
+  integer :: ik, is, ibnd
   complex(dp) :: ee                     ! i*dt/2
   real(dp) :: anorm
   integer, external :: find_free_unit
@@ -92,6 +97,14 @@ subroutine molecule_optical_absorption
      if (iverbosity > 0) write(stdout,'(5X,''Done with restart'')')
   endif
 
+
+  if (ehrenfest) then
+     call allocate_dyn_vars()
+     vel(:,:) = 0.d0
+     ions_dt = dt
+     allocate(if_pos(3,nat)) ! Ehrenfest work around
+     if_pos(:,:) = 1
+  endif
 
   ! enter the main TDDFT loop 
   do istep = 1, nstep
@@ -169,9 +182,13 @@ subroutine molecule_optical_absorption
     call mp_sum(dipole, inter_pool_comm)
 #endif
 
+    ! update the hamiltonian (recompute charge and potential)
+    call update_hamiltonian(istep)
+
     ! print observables
     if (ionode) then
       do is = 1, nspin
+        write(stdout,'(''ETOT   '','' '',1X,I6,E16.6)') istep, etot
         write(stdout,'(''CHARGE '',I1,1X,I6,3E16.6)') is, istep, charge(is)
         write(stdout,'(''DIP    '',I1,1X,I6,3E16.6)') is, istep, dipole(:,is)
         !write(stdout,'(''QUAD   '',I1,1X,I6,9E18.9)') is, istep, quadrupole(:,:,is)
@@ -179,8 +196,15 @@ subroutine molecule_optical_absorption
       enddo
     endif
      
-    ! update the hamiltonian (recompute charge and potential)
-    call update_hamiltonian(istep)
+    ! Ehrenfest dynamics
+    if (ehrenfest) then
+       if (is_allocated_bec_type(becp)) call deallocate_bec_type(becp)
+       call forces()
+       call verlet()
+       call trajectoryXYZ()
+       call hinit1()
+       call molecule_setup_r()
+    endif
      
     flush(stdout)
      
@@ -190,7 +214,7 @@ subroutine molecule_optical_absorption
   ! finish  
   call tddft_cgsolver_finalize()
   call deallocate_optical()
-  
+  if (ehrenfest) call deallocate_dyn_vars() 
     
 CONTAINS
 
@@ -199,10 +223,11 @@ CONTAINS
   !====================================================================    
   SUBROUTINE print_legend
     write(stdout,'(5X,''Output quantities:'')')
+    write(stdout,'(5X,''  ETOT         istep  total_energy'')')
     write(stdout,'(5X,''  CHARGE spin  istep  charge'')')
     write(stdout,'(5X,''  DIP    spin  istep  dipole(1:3)'')')
     !write(stdout,'(5X,''  QUAD   spin  istep  quadrupole(1:3,1:3)'')')
-    write(stdout,'(5X,''  ANG    spin  istep  Re[L(1:3)]  Im[L(1:3)]'')')
+    !write(stdout,'(5X,''  ANG    spin  istep  Re[L(1:3)]  Im[L(1:3)]'')')
     write(stdout,*)
     flush(stdout)
   END SUBROUTINE print_legend
@@ -232,7 +257,9 @@ CONTAINS
     tddft_spsi = (0.d0,0.d0)
     b = (0.d0,0.d0)
 
-    allocate (charge(nspin), dipole(3,nspin), quadrupole(3,3,nspin))
+    if (ehrenfest) allocate(tddft_Ppsi(npwx,nbnd))
+ 
+   allocate (charge(nspin), dipole(3,nspin), quadrupole(3,3,nspin))
     allocate (circular(3,nspin), circular_local(3))
     charge = 0.d0
     dipole = 0.d0
@@ -257,6 +284,7 @@ CONTAINS
     deallocate (tddft_psi, tddft_hpsi, tddft_spsi, b)
     deallocate (charge, dipole, quadrupole, circular, circular_local)
     deallocate (r_pos, r_pos_s)
+    if (ehrenfest) deallocate(tddft_Ppsi)
 
   END SUBROUTINE deallocate_optical
    

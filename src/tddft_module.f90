@@ -14,7 +14,8 @@ MODULE tddft_module
   !
   ! ... This module contains the variables used for TDDFT calculations
   !
-  USE kinds, ONLY : DP
+  USE kinds,               ONLY : dp
+  USE fixed_occ,           ONLY : tfixed_occ, f_inp ! occupations from input
   
   IMPLICIT NONE
   SAVE
@@ -30,6 +31,7 @@ MODULE tddft_module
   logical  :: l_tddft_restart      ! restart propagation from the last step
   integer  :: iverbosity           ! verbosity level (default = 1)
   logical  :: molecule             ! use molecular routuines
+  logical  :: ehrenfest            ! .true. if moving atoms
 
   complex(dp), parameter :: i_complex = (0.0_dp,1.0_dp)
 

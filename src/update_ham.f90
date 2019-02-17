@@ -56,6 +56,9 @@ SUBROUTINE update_hamiltonian(istep)
       if (iverbosity > 10) write(stdout,'(5X,''call newd'')')
     endif
   endif
+
+  ! calculate new energy
+  call sum_energies
     
   call stop_clock('updateH')
     
