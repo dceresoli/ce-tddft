@@ -1,0 +1,31 @@
+&control
+    prefix = 'na2'
+    calculation = 'scf'
+    restart_mode = 'from_scratch'
+    pseudo_dir = './pseudo/'
+    outdir = './scratch/'
+    tstress = .false.
+    tprnfor = .true.
+/
+&system
+    ibrav = 1
+    a = 10
+    nat = 2
+    ntyp = 1
+    ecutwfc = 20
+    nosym = .true.
+/
+&electrons
+    diagonalization = 'david'
+    conv_thr = 1.d-10
+/
+ATOMIC_SPECIES
+Na   0    Na.pz-n-vbc.UPF
+
+K_POINTS automatic
+1 1 1    0 0 0
+
+ATOMIC_POSITIONS angstrom
+Na       3.454625363   5.000000000   5.000000000
+Na       6.545374637   5.000000000   5.000000000
+

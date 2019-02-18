@@ -37,5 +37,58 @@ END SUBROUTINE trajectoryXYZ
 
 
 
+!-----------------------------------------------------------------------
+SUBROUTINE save_rho(istep)
+!-----------------------------------------------------------------------
+  USE kinds,            ONLY : dp
+  USE cell_base,        ONLY : at, bg, omega, alat, celldm, ibrav
+  USE ions_base,        ONLY : nat, ntyp => nsp, ityp, tau, zv, atm
+  USE run_info,         ONLY : title 
+  USE fft_base,         ONLY : dfftp
+  USE scatter_mod,      ONLY : gather_grid
+  USE io_global,        ONLY : stdout, ionode
+  USE io_files,         ONLY : prefix     
+  USE scf,              ONLY : rho, vltot, v
+  implicit none
+  integer, intent(in) :: istep
+  character(256) :: filename
+  real(dp), allocatable :: raux(:)
+#if defined(__MPI)
+  real(dp), allocatable :: raux1(:)
+#endif
 
+  allocate(raux(dfftp%nnr))
+#if defined(__MPI)
+  allocate(raux1(dfftp%nr1x*dfftp%nr2x*dfftp%nr3x))
+#endif
+
+  if (ionode) then
+     write(filename,'(''rho-'',A,''-'',I9.9,''.xsf'')') trim(prefix), istep
+     open(unit=118,file=trim(filename),status='unknown')
+     call xsf_struct (alat, at, nat, tau, atm, ityp, 118)
+  endif
+
+  raux(:) = rho%of_r(:,1)
+#if defined(__MPI)
+  call gather_grid (dfftp, raux, raux1)
+#endif
+
+  if (ionode) then
+#if defined(__MPI)
+    call xsf_fast_datagrid_3d(raux1, dfftp%nr1, dfftp%nr2, dfftp%nr3, &
+                              dfftp%nr1x, dfftp%nr2x, dfftp%nr3x, at, alat, 118)
+#else
+    call xsf_fast_datagrid_3d(raux, dfftp%nr1, dfftp%nr2, dfftp%nr3, &
+                              dfftp%nr1x, dfftp%nr2x, dfftp%nr3x, at, alat, 118)
+#endif
+  endif
+
+  deallocate(raux)
+#if defined(__MPI)
+  deallocate(raux1)
+#endif
+
+!-----------------------------------------------------------------------
+END SUBROUTINE save_rho
+!-----------------------------------------------------------------------
 

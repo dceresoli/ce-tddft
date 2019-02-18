@@ -28,7 +28,7 @@ SUBROUTINE tddft_readin()
   namelist /inputtddft/ job, prefix, tmp_dir, conv_threshold, verbosity, &
                         dt, e_strength, e_direction, nstep, nupdate_Dnm, &
                         l_circular_dichroism, l_tddft_restart, max_seconds, &
-                        molecule, ehrenfest
+                        molecule, ehrenfest, isave_rho
 
   if (.not. ionode .or. my_image_id > 0) goto 400
 
@@ -53,6 +53,7 @@ SUBROUTINE tddft_readin()
   max_seconds  =  1.d7
   molecule     = .true.
   ehrenfest    = .false.
+  isave_rho    = 0
 
   ! read input    
   read( 5, inputtddft, err = 200, iostat = ios )
@@ -115,6 +116,7 @@ SUBROUTINE tddft_bcast_input
   call mp_bcast(max_seconds, root, world_comm)
   call mp_bcast(molecule, root, world_comm)
   call mp_bcast(ehrenfest, root, world_comm)
+  call mp_bcast(isave_rho, root, world_comm)
 
 END SUBROUTINE tddft_bcast_input
 #endif

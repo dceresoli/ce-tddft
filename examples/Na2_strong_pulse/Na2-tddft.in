@@ -1,0 +1,10 @@
+&inputtddft
+    job = 'optical'
+    prefix = 'na2'
+    tmp_dir = './scratch/'
+    dt = 2.0
+    nstep = 1000
+    e_direction = 1
+    e_strength = 0.1  ! strong pulse
+    isave_rho = 100
+/

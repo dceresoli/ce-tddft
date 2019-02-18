@@ -45,8 +45,8 @@ MODULE tddft_module
 
   integer :: tddft_exit_code = 0
 
-  REAL(dp) :: max_seconds                 ! max CPU time, in s
-
+  REAL(dp) :: max_seconds           ! max CPU time, in s
+  INTEGER :: isave_rho              ! output rho every .. steps
 
 END MODULE tddft_module
 

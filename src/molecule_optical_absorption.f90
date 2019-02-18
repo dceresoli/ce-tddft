@@ -104,6 +104,8 @@ subroutine molecule_optical_absorption
      if_pos(:,:) = 1
   endif
 
+  if (isave_rho /= 0) call save_rho(0)
+
   ! enter the main TDDFT loop 
   do istep = 1, nstep
      
@@ -193,7 +195,12 @@ subroutine molecule_optical_absorption
         !write(stdout,'(''ANG    '',I1,1X,I6,3E16.6)') is, istep, circular(:,is)
       enddo
     endif
-     
+
+    ! output fields
+    if (isave_rho /= 0) then
+        if (mod(istep,isave_rho) == 0) call save_rho(istep)
+    endif
+
     ! Ehrenfest dynamics
     if (ehrenfest) then
        if (is_allocated_bec_type(becp)) call deallocate_bec_type(becp)

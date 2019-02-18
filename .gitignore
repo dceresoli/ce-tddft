@@ -8,3 +8,4 @@ src/Makefile
 src/Makefile-gpu
 autom4te.cache
 scratch
+src/make.depend
