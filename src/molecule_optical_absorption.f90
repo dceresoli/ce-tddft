@@ -38,7 +38,6 @@ subroutine molecule_optical_absorption
   USE scf,                         ONLY : rho, rho_core, rhog_core, vltot, v, vrs
   USE control_flags,               ONLY : tqr
   USE dynamics_module,             ONLY : vel, verlet, allocate_dyn_vars, deallocate_dyn_vars
-  USE dynamics_module,             ONLY : ions_dt => dt
   USE pwcom
   USE tddft_module
 
@@ -101,7 +100,6 @@ subroutine molecule_optical_absorption
   if (ehrenfest) then
      call allocate_dyn_vars()
      vel(:,:) = 0.d0
-     ions_dt = dt
      allocate(if_pos(3,nat)) ! Ehrenfest work around
      if_pos(:,:) = 1
   endif
@@ -188,7 +186,7 @@ subroutine molecule_optical_absorption
     ! print observables
     if (ionode) then
       do is = 1, nspin
-        write(stdout,'(''ENERGY '',2X,I6,5F16.10)') istep, etot, eband, ehart, etxc, ewld
+        write(stdout,'(''ENERGY '',2X,I6,5F16.8)') istep, etot, eband + deband, ehart, etxc+etxcc, ewld
         write(stdout,'(''CHARGE '',I1,1X,I6,3E16.6)') is, istep, charge(is)
         write(stdout,'(''DIP    '',I1,1X,I6,3E16.6)') is, istep, dipole(:,is)
         !write(stdout,'(''QUAD   '',I1,1X,I6,9E18.9)') is, istep, quadrupole(:,:,is)
@@ -202,8 +200,6 @@ subroutine molecule_optical_absorption
        call forces()
        call verlet()
        call trajectoryXYZ()
-       call hinit1()
-       call molecule_setup_r()
     endif
      
     flush(stdout)

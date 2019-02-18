@@ -16,14 +16,13 @@ MODULE tddft_module
   !
   USE kinds,               ONLY : dp
   USE fixed_occ,           ONLY : tfixed_occ, f_inp ! occupations from input
-  
+  USE dynamics_module,     ONLY : dt                ! timestep 
   IMPLICIT NONE
   SAVE
   
   character(80) :: job             ! 'optical'
   integer  :: e_direction          ! impulse electric field direction: 1-x 2-y 3-z
   real(dp) :: e_strength           ! impulse electron field strength
-  real(dp) :: dt                   ! timestep
   integer  :: nstep                ! number of timesteps for real-time tddft
   real(dp) :: conv_threshold       ! cg convergence threshold
   integer  :: nupdate_Dnm          ! update USPP Dnm matrix every n steps

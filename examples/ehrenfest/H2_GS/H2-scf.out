@@ -1,5 +1,5 @@
 
-     Program PWSCF v.6.3 starts on 17Feb2019 at 17:31:23 
+     Program PWSCF v.6.3 starts on 18Feb2019 at 10:30:38 
 
      This program is part of the open-source Quantum ESPRESSO suite
      for quantum simulation of materials; please cite
@@ -102,7 +102,7 @@ Warning: card / ignored
      negative rho (up, down):  7.125E-05 0.000E+00
      Starting wfcs are    2 randomized atomic wfcs
 
-     total cpu time spent up to now is        1.0 secs
+     total cpu time spent up to now is        0.6 secs
 
      Self-consistent Calculation
 
@@ -112,7 +112,7 @@ Warning: card / ignored
 
      negative rho (up, down):  1.411E-05 0.000E+00
 
-     total cpu time spent up to now is        1.4 secs
+     total cpu time spent up to now is        1.0 secs
 
      total energy              =      -2.33117032 Ry
      Harris-Foulkes estimate   =      -2.33831521 Ry
@@ -124,7 +124,7 @@ Warning: card / ignored
 
      negative rho (up, down):  8.192E-07 0.000E+00
 
-     total cpu time spent up to now is        1.7 secs
+     total cpu time spent up to now is        1.3 secs
 
      total energy              =      -2.33213209 Ry
      Harris-Foulkes estimate   =      -2.33222662 Ry
@@ -136,7 +136,7 @@ Warning: card / ignored
 
      negative rho (up, down):  1.383E-06 0.000E+00
 
-     total cpu time spent up to now is        2.1 secs
+     total cpu time spent up to now is        1.7 secs
 
      total energy              =      -2.33226224 Ry
      Harris-Foulkes estimate   =      -2.33226810 Ry
@@ -146,7 +146,7 @@ Warning: card / ignored
      CG style diagonalization
      ethr =  1.67E-06,  avg # of iterations =  4.0
 
-     total cpu time spent up to now is        2.4 secs
+     total cpu time spent up to now is        2.1 secs
 
      total energy              =      -2.33226036 Ry
      Harris-Foulkes estimate   =      -2.33226973 Ry
@@ -156,7 +156,7 @@ Warning: card / ignored
      CG style diagonalization
      ethr =  8.44E-07,  avg # of iterations =  4.0
 
-     total cpu time spent up to now is        2.8 secs
+     total cpu time spent up to now is        2.5 secs
 
      total energy              =      -2.33226247 Ry
      Harris-Foulkes estimate   =      -2.33226247 Ry
@@ -166,7 +166,7 @@ Warning: card / ignored
      CG style diagonalization
      ethr =  2.58E-09,  avg # of iterations =  4.0
 
-     total cpu time spent up to now is        3.1 secs
+     total cpu time spent up to now is        2.9 secs
 
      total energy              =      -2.33226248 Ry
      Harris-Foulkes estimate   =      -2.33226248 Ry
@@ -176,7 +176,7 @@ Warning: card / ignored
      CG style diagonalization
      ethr =  3.09E-11,  avg # of iterations =  4.0
 
-     total cpu time spent up to now is        3.5 secs
+     total cpu time spent up to now is        3.3 secs
 
      total energy              =      -2.33226248 Ry
      Harris-Foulkes estimate   =      -2.33226248 Ry
@@ -186,7 +186,7 @@ Warning: card / ignored
      CG style diagonalization
      ethr =  1.18E-12,  avg # of iterations =  4.0
 
-     total cpu time spent up to now is        3.8 secs
+     total cpu time spent up to now is        3.7 secs
 
      End of self-consistent calculation
 
@@ -218,50 +218,50 @@ Warning: card / ignored
 
      Writing output data file h2.save/
  
-     init_run     :      0.34s CPU      0.79s WALL (       1 calls)
-     electrons    :      2.74s CPU      2.81s WALL (       1 calls)
-     forces       :      0.06s CPU      0.06s WALL (       1 calls)
+     init_run     :      0.39s CPU      0.59s WALL (       1 calls)
+     electrons    :      3.04s CPU      3.10s WALL (       1 calls)
+     forces       :      0.07s CPU      0.07s WALL (       1 calls)
 
      Called by init_run:
-     wfcinit      :      0.03s CPU      0.29s WALL (       1 calls)
-     potinit      :      0.19s CPU      0.22s WALL (       1 calls)
-     hinit0       :      0.03s CPU      0.19s WALL (       1 calls)
+     wfcinit      :      0.04s CPU      0.20s WALL (       1 calls)
+     potinit      :      0.22s CPU      0.25s WALL (       1 calls)
+     hinit0       :      0.05s CPU      0.05s WALL (       1 calls)
 
      Called by electrons:
-     c_bands      :      0.44s CPU      0.43s WALL (       8 calls)
-     sum_band     :      0.36s CPU      0.37s WALL (       8 calls)
-     v_of_rho     :      1.62s CPU      1.66s WALL (       9 calls)
-     mix_rho      :      0.44s CPU      0.46s WALL (       8 calls)
+     c_bands      :      0.54s CPU      0.55s WALL (       8 calls)
+     sum_band     :      0.46s CPU      0.47s WALL (       8 calls)
+     v_of_rho     :      1.72s CPU      1.75s WALL (       9 calls)
+     mix_rho      :      0.45s CPU      0.45s WALL (       8 calls)
 
      Called by c_bands:
-     ccgdiagg     :      0.33s CPU      0.33s WALL (       8 calls)
-     wfcrot       :      0.13s CPU      0.39s WALL (       8 calls)
+     ccgdiagg     :      0.42s CPU      0.44s WALL (       8 calls)
+     wfcrot       :      0.15s CPU      0.31s WALL (       8 calls)
 
      Called by sum_band:
 
      Called by *cgdiagg:
-     h_psi        :      0.44s CPU      0.44s WALL (      31 calls)
-     cdiaghg      :      0.00s CPU      0.19s WALL (       8 calls)
+     h_psi        :      0.54s CPU      0.56s WALL (      31 calls)
+     cdiaghg      :      0.00s CPU      0.16s WALL (       8 calls)
 
      Called by h_psi:
-     h_psi:pot    :      0.44s CPU      0.44s WALL (      31 calls)
-     vloc_psi     :      0.44s CPU      0.44s WALL (      31 calls)
-     hs_1psi      :      0.32s CPU      0.32s WALL (      23 calls)
+     h_psi:pot    :      0.54s CPU      0.56s WALL (      31 calls)
+     vloc_psi     :      0.54s CPU      0.56s WALL (      31 calls)
+     hs_1psi      :      0.40s CPU      0.42s WALL (      23 calls)
      s_1psi       :      0.00s CPU      0.00s WALL (      23 calls)
 
      General routines
-     fft          :      1.33s CPU      1.53s WALL (      91 calls)
-     ffts         :      0.11s CPU      0.11s WALL (       8 calls)
-     fftw         :      0.41s CPU      0.39s WALL (      72 calls)
+     fft          :      1.50s CPU      1.50s WALL (      91 calls)
+     ffts         :      0.16s CPU      0.17s WALL (       8 calls)
+     fftw         :      0.48s CPU      0.49s WALL (      72 calls)
  
      Parallel routines
-     fft_scatt_xy :      0.27s CPU      0.31s WALL (     171 calls)
-     fft_scatt_yz :      0.65s CPU      0.69s WALL (     171 calls)
+     fft_scatt_xy :      0.28s CPU      0.34s WALL (     171 calls)
+     fft_scatt_yz :      0.80s CPU      0.80s WALL (     171 calls)
  
-     PWSCF        :      3.16s CPU      3.92s WALL
+     PWSCF        :      3.53s CPU      3.79s WALL
 
  
-   This run was terminated on:  17:31:27  17Feb2019            
+   This run was terminated on:  10:30:42  18Feb2019            
 
 =------------------------------------------------------------------------------=
    JOB DONE.

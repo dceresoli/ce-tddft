@@ -8,56 +8,6 @@
 
 
 !-----------------------------------------------------------------------
-SUBROUTINE sum_energies
-!-----------------------------------------------------------------------
-  USE kinds,              ONLY : dp
-  USE paw_variables,      ONLY : okpaw
-  USE ldaU,               ONLY : lda_plus_u, eth
-  USE control_flags,      ONLY : llondon, ldftd3, lxdm, ts_vdw
-  USE xdm_module,         ONLY : energy_xdm
-  USE extfield,           ONLY : tefield, etotefield
-  USE tsvdw_module,       ONLY : EtsvdW
-  USE plugin_variables,   ONLY : plugin_etot
-  USE pwcom
-  implicit none
-  real(dp) :: eext = 0.d0
-
-  if (okpaw) etot = etot + epaw
-  if (lda_plus_u) etot = etot + eth
-
-  if (llondon) then
-     etot = etot + elondon
-     hwf_energy = hwf_energy + elondon
-  endif
-
-  if (lxdm) then
-     exdm = energy_xdm()
-     etot = etot + exdm
-     hwf_energy = hwf_energy + exdm
-  endif
-
-  if (ts_vdw) then
-     ! factor 2 converts from Ha to Ry units
-     etot = etot + 2.0d0*EtsvdW
-     hwf_energy = hwf_energy + 2.0d0*EtsvdW
-  endif
-
-  if (tefield) then
-     etot = etot + etotefield
-     hwf_energy = hwf_energy + etotefield
-  endif
-
-  ! adds possible external contribution from plugins to the energy
-  etot = etot + plugin_etot
-
-  return
-
-!-----------------------------------------------------------------------
-END SUBROUTINE sum_energies
-!-----------------------------------------------------------------------
-
-
-!-----------------------------------------------------------------------
 SUBROUTINE trajectoryXYZ
 !-----------------------------------------------------------------------
   USE constants,      ONLY : bohr_radius_angs
