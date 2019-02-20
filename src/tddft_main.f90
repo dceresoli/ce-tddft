@@ -17,21 +17,15 @@ PROGRAM tddft_main
   ! ...   Xiaofeng Qian, Ju Li, Xi Lin, and Sidney Yip, PRB 73, 035408 (2006)
   ! ...
   USE kinds,           ONLY : DP
-  USE io_files,        ONLY : tmp_dir !, create_directory
   USE io_global,       ONLY : stdout, meta_ionode, meta_ionode_id
   USE mp,              ONLY : mp_bcast
-  USE cell_base,       ONLY : tpiba
-  USE tddft_module,    ONLY : job, molecule, max_seconds, tddft_exit_code
+  USE tddft_module,    ONLY : job, molecule, max_seconds
   USE check_stop,      ONLY : check_stop_init
   USE control_flags,   ONLY : io_level, gamma_only, use_para_diag
-  USE mp_global,       ONLY : mp_startup, nproc_pool_file
+  USE mp_global,       ONLY : mp_startup
   USE mp_bands,        ONLY : nbgrp
-  USE mp_pools,        ONLY : nproc_pool
   USE mp_world,        ONLY : world_comm
   USE environment,     ONLY : environment_start, environment_end
-  USE lsda_mod,        ONLY : nspin
-  USE wvfct,           ONLY : nbnd
-  USE uspp,            ONLY : okvan
   USE wvfct,           ONLY : nbnd
   USE io_global,       ONLY : stdout
   USE noncollin_module,ONLY : noncolin
@@ -46,7 +40,6 @@ PROGRAM tddft_main
   !------------------------------------------------------------------------
   IMPLICIT NONE
   CHARACTER (LEN=9)   :: code = 'TDDFT'
-  CHARACTER (LEN=10)  :: dirname = 'dummy'
   LOGICAL, EXTERNAL  :: check_para_diag
   !------------------------------------------------------------------------
 

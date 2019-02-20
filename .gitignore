@@ -1,6 +1,7 @@
 *.x
 *.o
 *.mod
+*__genmod.f90
 config.log
 config.status
 makedeps.sh

@@ -19,15 +19,14 @@ SUBROUTINE update_hamiltonian(istep)
   USE gvecs,         ONLY : doublegrid
   USE io_global,     ONLY : stdout
   USE lsda_mod,      ONLY : nspin
-  USE uspp,          ONLY : okvan, nkb
+  USE uspp,          ONLY : okvan
   USE dfunct,        ONLY : newd
   USE tddft_module,  ONLY : nupdate_Dnm, iverbosity
-  USE becmod,        ONLY : becp, allocate_bec_type, deallocate_bec_type
   USE wvfct,         ONLY : nbnd
   USE scf,           ONLY : rho
-  USE cell_base,     ONLY : tpiba2, alat, omega, at, bg
-  USE ions_base,     ONLY : nsp, atm, zv, nat, tau, ityp
-  USE gvect,         ONLY : ngm, gstart, g, gg, gcutm, eigts1, eigts2, eigts3
+  USE cell_base,     ONLY : alat, omega, at, bg
+  USE ions_base,     ONLY : nsp, zv, nat, tau, ityp
+  USE gvect,         ONLY : ngm, gstart, g, gg, gcutm
   USE control_flags, ONLY : gamma_only
   USE pwcom
   implicit none
@@ -93,7 +92,6 @@ FUNCTION delta_eband() RESULT(delta_e)
   USE fft_base,         ONLY : dfftp
   USE noncollin_module, ONLY : noncolin
   USE mp,               ONLY : mp_sum, mp_barrier
-  USE mp_pools,         ONLY : intra_pool_comm, inter_pool_comm
   USE mp_bands,         ONLY : intra_bgrp_comm
   USE paw_variables,    ONLY : okpaw, ddd_paw
   USE ldaU,             ONLY : lda_plus_U
@@ -147,7 +145,7 @@ SUBROUTINE sum_energies
   USE kinds,              ONLY : dp
   USE paw_variables,      ONLY : okpaw
   USE ldaU,               ONLY : lda_plus_u, eth
-  USE control_flags,      ONLY : llondon, ldftd3, lxdm, ts_vdw
+  USE control_flags,      ONLY : llondon, lxdm, ts_vdw
   USE xdm_module,         ONLY : energy_xdm
   USE extfield,           ONLY : tefield, etotefield
   USE tsvdw_module,       ONLY : EtsvdW
@@ -182,7 +180,7 @@ SUBROUTINE sum_energies
   endif
 
   ! adds possible external contribution from plugins to the energy
-  etot = etot + plugin_etot
+  etot = etot + plugin_etot + eext
 
   return
 

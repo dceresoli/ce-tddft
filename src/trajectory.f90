@@ -41,14 +41,13 @@ END SUBROUTINE trajectoryXYZ
 SUBROUTINE save_rho(istep)
 !-----------------------------------------------------------------------
   USE kinds,            ONLY : dp
-  USE cell_base,        ONLY : at, bg, omega, alat, celldm, ibrav
-  USE ions_base,        ONLY : nat, ntyp => nsp, ityp, tau, zv, atm
-  USE run_info,         ONLY : title 
+  USE cell_base,        ONLY : at, alat
+  USE ions_base,        ONLY : nat, ityp, tau, atm
   USE fft_base,         ONLY : dfftp
   USE scatter_mod,      ONLY : gather_grid
   USE io_global,        ONLY : stdout, ionode
   USE io_files,         ONLY : prefix     
-  USE scf,              ONLY : rho, vltot, v
+  USE scf,              ONLY : rho
   implicit none
   integer, intent(in) :: istep
   character(256) :: filename

@@ -15,10 +15,9 @@ SUBROUTINE setup_wavepacket
   !
   USE kinds,            ONLY : dp
   USE mp,               ONLY : mp_sum
-  USE mp_pools,         ONLY : inter_pool_comm
-  USE mp_bands,         ONLY : me_bgrp, intra_bgrp_comm
+  USE mp_bands,         ONLY : intra_bgrp_comm
   USE fft_base,         ONLY : dffts
-  USE cell_base,        ONLY : alat, at, bg
+  USE cell_base,        ONLY : alat, at
   USE io_global,        ONLY : stdout
   USE io_files,         ONLY : nwordwfc, iunwfc
   USE wavefunctions,    ONLY : evc, psic
@@ -32,7 +31,7 @@ SUBROUTINE setup_wavepacket
   real(dp), parameter :: rydberg = 13.605693d0
   real(dp) :: wp_k
   real(dp) :: inv_nr1s, inv_nr2s, inv_nr3s
-  integer :: ia, i, j, k, j0, k0, idx, ir, ir_end, ipol, ik
+  integer :: i, j, k, j0, k0, idx, ir, ipol, ik
   real(dp) :: wp, phase, r(3), norm
   complex(dp), external :: zdotc
 

@@ -14,14 +14,12 @@ SUBROUTINE apply_electric_field(tddft_psi)
   ! ... to each band
   !
   USE kinds,        ONLY : dp
-  USE mp_global,    ONLY : me_pool, intra_pool_comm
   USE mp,           ONLY : mp_sum
   USE fft_base,     ONLY : dffts
-  USE ions_base,    ONLY : nat, tau, ityp, zv
-  USE cell_base,    ONLY : at, bg, alat
+  USE cell_base,    ONLY : alat
   USE wvfct,        ONLY : current_k, npwx, nbnd
   USE klist,        ONLY : igk_k, ngk
-  USE io_files,     ONLY : nwordwfc, iunwfc
+  USE io_files,     ONLY : nwordwfc
   USE buffers,      ONLY : save_buffer
   USE wavefunctions,ONLY : evc
   USE fft_base,     ONLY : dffts

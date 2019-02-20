@@ -18,25 +18,21 @@ subroutine molecule_optical_absorption
   USE kinds,                       ONLY : dp
   USE io_global,                   ONLY : stdout, ionode
   USE io_files,                    ONLY : nwordwfc, iunwfc
-  USE ions_base,                   ONLY : nat, ntyp => nsp, ityp, if_pos
-  USE cell_base,                   ONLY : at, bg, omega, tpiba, tpiba2, alat
+  USE ions_base,                   ONLY : nat, if_pos
+  USE cell_base,                   ONLY : at, tpiba, alat
   USE wavefunctions,               ONLY : evc
   USE klist,                       ONLY : nks, nkstot, wk, xk, nelec, ngk, igk_k
   USE wvfct,                       ONLY : nbnd, npwx, wg, g2kin, current_k
   USE lsda_mod,                    ONLY : current_spin, lsda, isk, nspin
   USE becmod,                      ONLY : becp, calbec, allocate_bec_type, &
                                           is_allocated_bec_type, deallocate_bec_type
-  USE mp_pools,                    ONLY : my_pool_id, inter_pool_comm, intra_pool_comm
+  USE mp_pools,                    ONLY : inter_pool_comm
   USE mp,                          ONLY : mp_sum, mp_barrier
-  USE gvect,                       ONLY : ngm, g
+  USE gvect,                       ONLY : g
   USE fft_base,                    ONLY : dfftp, dffts
   USE buffers,                     ONLY : get_buffer, save_buffer
   USE fixed_occ,                   ONLY : tfixed_occ 
-  USE uspp,                        ONLY : nkb, vkb, deeq
-  USE ldaU,                        ONLY : lda_plus_U
-  USE uspp_param,                  ONLY : nh
-  USE scf,                         ONLY : rho, rho_core, rhog_core, vltot, v, vrs
-  USE control_flags,               ONLY : tqr
+  USE uspp,                        ONLY : nkb, vkb
   USE dynamics_module,             ONLY : vel, verlet, allocate_dyn_vars, deallocate_dyn_vars
   USE pwcom
   USE tddft_module
@@ -301,7 +297,6 @@ CONTAINS
   subroutine compute_circular_dichroism(cd)
     USE fft_base,               ONLY : dfftp
     USE fft_interfaces,         ONLY : invfft
-    USE mp_global,              ONLY : me_pool
     IMPLICIT NONE
     REAL(DP) :: xx(dfftp%nnr), yy(dfftp%nnr), zz(dfftp%nnr), gk
     INTEGER  :: ik, ibnd, i, j, k, j0, k0, idx, ir, ipol, ind, i_current_spin, ig

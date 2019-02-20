@@ -46,8 +46,6 @@ MODULE tddft_module
   real(dp) :: max_seconds           ! max CPU time, in s
   integer :: isave_rho              ! output rho every .. steps
 
-  integer :: tddft_exit_code = 0
-
   ! wavepacket variables (wavepacket alwais moving in the -z direction)
   logical :: wavepacket = .false.   ! .true. to simulate a wavepacket
   real(dp) :: wp_pos(3)             ! wavepacket position in angstrom

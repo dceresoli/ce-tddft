@@ -13,20 +13,16 @@ SUBROUTINE tddft_setup
   ! ... TDDFT setup
   !
   USE kinds,         ONLY : dp
-  USE io_global,     ONLY : stdout, ionode
-  USE ions_base,     ONLY : tau, nat, ntyp => nsp, atm
-  USE atom,          ONLY : rgrid
-  USE wvfct,         ONLY : nbnd, et, wg, npwx
-  USE lsda_mod,      ONLY : nspin, lsda
-  USE scf,           ONLY : v, vrs, vltot, rho, rho_core, kedtau
-  USE gvect,         ONLY : ngm
+  USE io_global,     ONLY : stdout
+  USE wvfct,         ONLY : nbnd, et, wg
+  USE lsda_mod,      ONLY : nspin
+  USE scf,           ONLY : v, vrs, vltot, kedtau
   USE fft_base,      ONLY : dfftp
   USE gvecs,         ONLY : doublegrid
-  USE klist,         ONLY : xk, degauss, ngauss, nks, nelec, lgauss, wk, two_fermi_energies
+  USE klist,         ONLY : degauss, ngauss, nks, lgauss, wk, two_fermi_energies
   USE klist,         ONLY : ltetra
   USE noncollin_module,  ONLY : noncolin
   USE constants,     ONLY : degspin, pi
-  USE symm_base,     ONLY : nsym, s
   USE mp_pools,      ONLY : inter_pool_comm 
   USE mp,            ONLY : mp_max, mp_min 
   USE dfunct,        ONLY : newd
@@ -35,7 +31,7 @@ SUBROUTINE tddft_setup
   USE tddft_module
 
   implicit none
-  integer :: ik, ibnd, ipol
+  integer :: ik, ibnd
   real(dp) :: emin, emax, xmax, small, fac, target
     
   call start_clock ('tddft_setup')
@@ -149,7 +145,7 @@ SUBROUTINE tddft_setup
   call update_hamiltonian(-1)
 
   call stop_clock('tddft_setup')
-    
+  
 END SUBROUTINE tddft_setup
 
 

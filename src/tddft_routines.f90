@@ -15,8 +15,8 @@ SUBROUTINE tddft_readin()
   ! ... list of input keywords.
   !
   USE tddft_module
-  USE io_files,         ONLY : nd_nmbr, prefix, tmp_dir  
-  USE io_global,        ONLY : ionode, stdout
+  USE io_files,         ONLY : prefix, tmp_dir  
+  USE io_global,        ONLY : ionode
   USE constants,        ONLY : bohr_radius_angs, au_sec
   USE mp_images,        ONLY : my_image_id
 
@@ -210,14 +210,10 @@ SUBROUTINE tddft_openfil
   ! ... Open files needed for TDDFT
   !
   USE tddft_module   
-  USE io_global,        ONLY : stdout
   USE wvfct,            ONLY : nbnd, npwx
   USE ldaU,             ONLY : lda_plus_U, nwfcU
-  USE klist,            ONLY : nks
-  USE io_files,         ONLY : prefix, iunhub, iunwfc, &
-                               nwordwfcU, nwordwfc, nwordatwfc, seqopn
+  USE io_files,         ONLY : iunhub, iunwfc,nwordwfcU, nwordwfc, seqopn
   USE noncollin_module, ONLY : npol
-  USE mp_global,        ONLY : kunit
   USE buffers,          ONLY : open_buffer
   USE control_flags,    ONLY : io_level    
   IMPLICIT NONE  
@@ -256,8 +252,10 @@ SUBROUTINE tddft_closefil
   ! ... Close files opened by TDDFT
   !
   USE ldaU,             ONLY : lda_plus_U  
-  USE io_files,         ONLY : prefix, iunhub, iunwfc
+  USE io_files,         ONLY : iunhub, iunwfc
   USE buffers,          ONLY : close_buffer
+  USE tddft_module
+  IMPLICIT NONE
 
   call close_buffer( iunwfc, 'keep' )
   call close_buffer( iunevcn, 'keep' )
@@ -322,7 +320,7 @@ SUBROUTINE tddft_memory_report
   !
   USE io_global,                 ONLY : stdout
   USE noncollin_module,          ONLY : npol
-  USE uspp,                      ONLY : okvan, nkb
+  USE uspp,                      ONLY : nkb
   USE fft_base,                  ONLY : dffts
   USE pwcom
   IMPLICIT NONE

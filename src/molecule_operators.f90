@@ -15,7 +15,6 @@ SUBROUTINE molecule_setup_r
   !
   USE kinds,        ONLY : dp
   USE mp,           ONLY : mp_sum
-  USE mp_bands,     ONLY : me_bgrp
   USE fft_base,     ONLY : dfftp, dffts
   USE ions_base,    ONLY : nat, tau, ityp, zv
   USE cell_base,    ONLY : at, bg
@@ -25,7 +24,7 @@ SUBROUTINE molecule_setup_r
   real(dp) :: zvtot, x0(3), r(3)
   real(dp) :: inv_nr1, inv_nr2, inv_nr3
   real(dp) :: inv_nr1s, inv_nr2s, inv_nr3s
-  integer :: ia, i, j, k, j0, k0, idx, ir, ir_end, ipol
+  integer :: ia, i, j, k, j0, k0, idx, ir, ipol
 
   ! calculate the center of charge
   zvtot = 0.d0
