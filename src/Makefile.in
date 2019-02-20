@@ -14,7 +14,7 @@ MODFLAGS = $(MOD_FLAG)$(QE_SOURCE)/iotk/src $(MOD_FLAG)$(QE_SOURCE)/Modules \
 TDDFT_OBJS = tddft_version.o tddft_module.o tddft_main.o tddft_routines.o \
 	     tddft_setup.o tddft_ch_psi_all.o tddft_cgsolver.o \
 	     update_ham.o apply_efield.o molecule_optical_absorption.o \
-	     molecule_operators.o stop_code.o trajectory.o
+	     molecule_operators.o stop_code.o trajectory.o wavepacket.o
 
 LIBOBJS = $(QE_SOURCE)/clib/clib.a $(QE_SOURCE)/iotk/src/libiotk.a
 QEMODS = $(QE_SOURCE)/Modules/libqemod.a \

@@ -140,6 +140,12 @@ SUBROUTINE tddft_setup
   alpha_pv = max(alpha_pv, 1.0d-2)
   write(stdout,'(5X,''alpha_pv='',F12.4,'' eV'')') alpha_pv*rytoev
 
+  ! wavepacket
+  if (wavepacket) then
+     call setup_wavepacket
+  endif
+
+  ! initialize hamiltonian
   call update_hamiltonian(-1)
 
   call stop_clock('tddft_setup')

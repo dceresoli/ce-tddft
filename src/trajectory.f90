@@ -64,6 +64,7 @@ SUBROUTINE save_rho(istep)
 
   if (ionode) then
      write(filename,'(''rho-'',A,''-'',I9.9,''.xsf'')') trim(prefix), istep
+     write(stdout,'(5X,''writing density to file: '',A)') trim(filename)
      open(unit=118,file=trim(filename),status='unknown')
      call xsf_struct (alat, at, nat, tau, atm, ityp, 118)
   endif

@@ -43,10 +43,17 @@ MODULE tddft_module
   integer, parameter :: iunevcn = 52      ! evc for restart
   real(dp) :: alpha_pv                    ! shift of conduction levels
 
+  real(dp) :: max_seconds           ! max CPU time, in s
+  integer :: isave_rho              ! output rho every .. steps
+
   integer :: tddft_exit_code = 0
 
-  REAL(dp) :: max_seconds           ! max CPU time, in s
-  INTEGER :: isave_rho              ! output rho every .. steps
+  ! wavepacket variables (wavepacket alwais moving in the -z direction)
+  logical :: wavepacket = .false.   ! .true. to simulate a wavepacket
+  real(dp) :: wp_pos(3)             ! wavepacket position in angstrom
+  real(dp) :: wp_d(3)               ! wavepacket spread in ansgtrom
+  real(dp) :: wp_ekin               ! wavepacket energy in eV
+  integer :: wp_ibnd                ! (empty) band to accommodate wp
 
 END MODULE tddft_module
 

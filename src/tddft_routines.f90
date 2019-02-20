@@ -28,7 +28,8 @@ SUBROUTINE tddft_readin()
   namelist /inputtddft/ job, prefix, tmp_dir, conv_threshold, verbosity, &
                         dt, e_strength, e_direction, nstep, nupdate_Dnm, &
                         l_circular_dichroism, l_tddft_restart, max_seconds, &
-                        molecule, ehrenfest, isave_rho
+                        molecule, ehrenfest, isave_rho, wavepacket, wp_pos, &
+                        wp_d, wp_ekin
 
   if (.not. ionode .or. my_image_id > 0) goto 400
 
@@ -52,9 +53,15 @@ SUBROUTINE tddft_readin()
   l_tddft_restart      = .false.
   max_seconds  =  1.d7
   molecule     = .true.
-  ehrenfest    = .false.
-  isave_rho    = 0
 
+  ehrenfest    = .false.                   ! Ehrenfest dynamics
+  isave_rho    = 0                         ! save density in XSF format
+
+  wavepacket   = .false.
+  wp_pos(1:3) = 0.d0
+  wp_d(1:3) = 0.d0
+  wp_ekin = 0.d0
+ 
   ! read input    
   read( 5, inputtddft, err = 200, iostat = ios )
 
@@ -117,6 +124,10 @@ SUBROUTINE tddft_bcast_input
   call mp_bcast(molecule, root, world_comm)
   call mp_bcast(ehrenfest, root, world_comm)
   call mp_bcast(isave_rho, root, world_comm)
+  call mp_bcast(wavepacket, root, world_comm)
+  call mp_bcast(wp_pos, root, world_comm)
+  call mp_bcast(wp_d, root, world_comm)
+  call mp_bcast(wp_ekin, root, world_comm)
 
 END SUBROUTINE tddft_bcast_input
 #endif
@@ -194,6 +205,7 @@ END SUBROUTINE tddft_summary
 
 !-----------------------------------------------------------------------
 SUBROUTINE tddft_openfil
+  !-----------------------------------------------------------------------
   !
   ! ... Open files needed for TDDFT
   !

@@ -40,7 +40,6 @@ subroutine molecule_optical_absorption
   USE dynamics_module,             ONLY : vel, verlet, allocate_dyn_vars, deallocate_dyn_vars
   USE pwcom
   USE tddft_module
-
   IMPLICIT NONE
 
   !-- tddft variables ----------------------------------------------------
@@ -53,8 +52,9 @@ subroutine molecule_optical_absorption
   integer :: istep, lter, flag_global
   integer :: ik, is, ibnd
   complex(dp) :: ee                     ! i*dt/2
-  real(dp) :: anorm
+  real(dp) :: anorm, wclock
   integer, external :: find_free_unit
+  real(dp), external :: get_clock
   external tddft_ch_psi_all
 
   ! TODO: restart
@@ -106,7 +106,8 @@ subroutine molecule_optical_absorption
 
   if (isave_rho /= 0) call save_rho(0)
 
-  ! enter the main TDDFT loop 
+  ! enter the main TDDFT loop
+  wclock = get_clock('TDDFT')
   do istep = 1, nstep
      
     ! calculate dipole moment along x, y, and z direction
@@ -191,6 +192,8 @@ subroutine molecule_optical_absorption
         write(stdout,'(''ENERGY '',2X,I6,5F16.8)') istep, etot, eband + deband, ehart, etxc+etxcc, ewld
         write(stdout,'(''CHARGE '',I1,1X,I6,3E16.6)') is, istep, charge(is)
         write(stdout,'(''DIP    '',I1,1X,I6,3E16.6)') is, istep, dipole(:,is)
+        if (iverbosity > 11) write(stdout,'(''CPUTIME'',F16.6)') get_clock('TDDFT') - wclock
+        wclock = get_clock('TDDFT')
         !write(stdout,'(''QUAD   '',I1,1X,I6,9E18.9)') is, istep, quadrupole(:,:,is)
         !write(stdout,'(''ANG    '',I1,1X,I6,3E16.6)') is, istep, circular(:,is)
       enddo
