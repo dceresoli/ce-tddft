@@ -9,6 +9,9 @@
 !-----------------------------------------------------------------------
 SUBROUTINE setup_wavepacket
   !-----------------------------------------------------------------------
+#if (__INTEL_COMPILER == 1500)
+!DIR$ NOOPTIMIZE
+#endif
   !
   ! ... Setup a wavepacket in real space. The wavepacket is moving
   ! ... in the -z direction.
@@ -32,7 +35,7 @@ SUBROUTINE setup_wavepacket
   real(dp) :: wp_k
   real(dp) :: inv_nr1s, inv_nr2s, inv_nr3s
   integer :: i, j, k, j0, k0, idx, ir, ipol, ik
-  real(dp) :: wp, phase, r(3), norm
+  real(dp) :: wp, phase, r(3), norm, expon
   complex(dp), external :: zdotc
 
   ! convert to atomic units
@@ -89,10 +92,10 @@ SUBROUTINE setup_wavepacket
      r = r * alat
 
      ! gaussian envelope
-     wp = 1.d0
-     wp = wp*exp(-0.5d0 * (r(1)-wp_pos(1))**2 / wp_d(1)**2)
-     wp = wp*exp(-0.5d0 * (r(2)-wp_pos(2))**2 / wp_d(2)**2)
-     wp = wp*exp(-0.5d0 * (r(3)-wp_pos(3))**2 / wp_d(3)**2)
+     expon = (r(1)-wp_pos(1))**2 / wp_d(1)**2
+     expon = expon + (r(2)-wp_pos(2))**2 / wp_d(2)**2
+     expon = expon + (r(3)-wp_pos(3))**2 / wp_d(3)**2
+     wp = exp(-0.5d0 * expon)
 
      ! wp momentum
      phase = -wp_k * r(3)
