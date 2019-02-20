@@ -1,0 +1,48 @@
+&control
+    prefix = 'benzene'
+    calculation = 'scf'
+    restart_mode = 'from_scratch'
+    pseudo_dir = './pseudo/'
+    outdir = './scratch/'
+    tstress = .false.
+    tprnfor = .true.
+/
+
+&system
+    ibrav = 8
+    a = 10
+    b = 10
+    c = 30
+    nat = 12
+    ntyp = 2
+    ecutwfc = 50
+    nosym = .true.
+    nbnd = 16
+/
+
+&electrons
+    diagonalization = 'david'
+    conv_thr = 1.d-10
+/
+
+ATOMIC_SPECIES
+C    12.00000  C.pz-vbc.UPF
+H     1.00000  H.pz-vbc.UPF
+
+K_POINTS automatic
+1 1 1    0 0 0
+
+ATOMIC_POSITIONS angstrom
+C      6.383000     5.000000    15.000000
+C      5.691000     6.197000    15.000000
+C      4.309000     6.197000    15.000000
+C      3.617000     5.000000    15.000000
+C      4.309000     3.803000    15.000000
+C      5.691000     3.803000    15.000000
+H      7.463000     5.000000    15.000000
+H      6.231000     7.133000    15.000000
+H      3.769000     7.133000    15.000000
+H      2.537000     5.000000    15.000000
+H      3.769000     2.867000    15.000000
+H      6.231000     2.867000    15.000000
+
