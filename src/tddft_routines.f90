@@ -164,7 +164,6 @@ SUBROUTINE tddft_summary
   USE wvfct,            ONLY : nbnd
   USE paw_variables,    ONLY : okpaw
   USE uspp,             ONLY : okvan
-  USE error_handler,    ONLY : warning
   USE tddft_module
   implicit none
   integer :: is
@@ -179,7 +178,7 @@ SUBROUTINE tddft_summary
   endif
   if (ehrenfest) then
      write(stdout,'(5X,''Ehrenfest dynamics'')')
-     if (okpaw .or. okvan) call warning('Ehrenfest dynamics not yet supported with USPP and PAW')
+     if (okpaw .or. okvan) call infomsg('tddft_summary', 'Ehrenfest dynamics not yet supported with USPP and PAW')
   endif
   write(stdout,'(5X,''Number or steps       : '',I12)') nstep
   write(stdout,'(5X,''Time step             : '',F12.4,'' rydberg_atomic_time'')') dt

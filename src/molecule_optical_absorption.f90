@@ -127,6 +127,7 @@ subroutine molecule_optical_absorption
       else
         call get_buffer (evc, nwordwfc, iunevcn, ik)
       endif
+      if (.not. is_allocated_bec_type(becp)) call allocate_bec_type(nkb, nbnd, becp)
       call calbec( npw, vkb, evc, becp )
       if ( (istep > 1) .or. (l_tddft_restart .and. (istep == 1)) ) then
         call get_buffer (tddft_psi, nwordtdwfc, iuntdwfc, ik)
@@ -239,7 +240,7 @@ CONTAINS
   ! Initialize and allocate memory
   !====================================================================    
   SUBROUTINE allocate_optical()
-    USE becmod, ONLY : becp, allocate_bec_type
+    USE becmod, ONLY : becp, allocate_bec_type, is_allocated_bec_type
     IMPLICIT NONE
     integer :: ik
     
@@ -248,7 +249,7 @@ CONTAINS
       if (nbnd_occ(ik) > nbnd_occ_max) nbnd_occ_max = nbnd_occ(ik)
     enddo
 
-    call allocate_bec_type(nkb, nbnd, becp)
+    if (.not. is_allocated_bec_type(becp)) call allocate_bec_type(nkb, nbnd, becp)
    
     allocate (tddft_psi (npwx,nbnd,2))
     allocate (tddft_hpsi(npwx,nbnd_occ_max))
@@ -261,7 +262,7 @@ CONTAINS
 
     if (ehrenfest) allocate(tddft_Ppsi(npwx,nbnd))
  
-   allocate (charge(nspin), dipole(3,nspin), quadrupole(3,3,nspin))
+    allocate (charge(nspin), dipole(3,nspin), quadrupole(3,3,nspin))
     allocate (circular(3,nspin), circular_local(3))
     charge = 0.d0
     dipole = 0.d0

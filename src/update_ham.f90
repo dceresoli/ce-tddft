@@ -28,6 +28,9 @@ SUBROUTINE update_hamiltonian(istep)
   USE ions_base,     ONLY : nsp, zv, nat, tau, ityp
   USE gvect,         ONLY : ngm, gstart, g, gg, gcutm
   USE control_flags, ONLY : gamma_only
+  USE becmod,        ONLY : becp, calbec, allocate_bec_type, &
+                            is_allocated_bec_type, deallocate_bec_type
+  USE uspp,          ONLY : nkb
   USE pwcom
   implicit none
   integer, intent(in) :: istep
@@ -39,6 +42,7 @@ SUBROUTINE update_hamiltonian(istep)
   ! calculate total charge density
   rho%of_g(:,:) = (0.d0,0.d0)
   rho%of_r(:,:) = 0.d0
+  if (okvan .and. is_allocated_bec_type(becp)) call deallocate_bec_type(becp)
   call sum_band()
 
   if (lda_plus_U) then
