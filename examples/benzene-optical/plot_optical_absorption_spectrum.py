@@ -25,7 +25,7 @@ if len(sys.argv) > 1:
     oas_figure_filename = molecule+'_'+pol+'.png'
     oas_output_filename = molecule+'_'+pol+'.dat'
 else:
-    print 'usage: ./plot_optical_absorption.py  x | y | z'
+    print('usage: ./plot_optical_absorption.py  x | y | z')
     sys.exit(1)
 
 
@@ -41,11 +41,11 @@ A_IN_M = 1.0e-10
 
 #-----------------------------------------------------------#
 ## read dipole file
-dp_file = file(dipole_filename, "r")
+dp_file = open(dipole_filename, "r")
 data=[]
 for line in dp_file.readlines():
     if not line.startswith('DIP'): continue
-    data.append(map(float, line.split()[3:]))
+    data.append(list(map(float, line.split()[3:])))
 
 dp_file.close()
 dp      = numpy.array(data)
@@ -57,7 +57,7 @@ nstep   = dp.shape[0]
 dt      = dt * FEMTOSECOND * EV_IN_J / HBAR
 nt      = numpy.linspace(0, (nstep-1), nstep) 
 t       = nt * dt
-dE      = (E_end - E_begin) / numpy.float(NEgrid-1)
+dE      = (E_end - E_begin) / float(NEgrid-1)
 dp_damping = numpy.exp( - t**2 * damping_factor )
 
 
@@ -69,18 +69,18 @@ E_axis  = numpy.zeros(NEgrid)
 for it in range(NEgrid):
     Eit     = E_begin + dE * it
     E_axis[it] = Eit
-    dp_fft = numpy.sum( dp_diff[range(nstep)] * dp_damping * numpy.sin( Eit * t))
+    dp_fft = numpy.sum( dp_diff[list(range(nstep))] * dp_damping * numpy.sin( Eit * t))
     S[it]  = dp_fft* ( dE*it ) * 2 * dt /e_strength /numpy.pi
 
 S  = S * ELECTRON_REST_MASS_IN_KG * ELEMENTARY_CHARGE_IN_C * HBAR**(-2) * A_IN_M**2
 
 ## check sum_rule = total number of valence electrons
 SumRule  = numpy.sum( S ) * dE
-print "Sum rule = ", SumRule
+print("Sum rule = ", SumRule)
 
 ## print spectrum in output
 f = open(oas_output_filename, "wt")
-for i in xrange(len(E_axis)):
+for i in range(len(E_axis)):
     f.write("%f %f\n" % (E_axis[i],S[i]))
 f.close()
 
@@ -89,7 +89,7 @@ f.close()
 try:
     import pylab
 except:
-    print "pylab not available: not plotting now"
+    print("pylab not available: not plotting now")
     sys.exit(1)
 
 params = {'axes.labelsize':  16,
