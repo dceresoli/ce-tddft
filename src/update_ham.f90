@@ -92,7 +92,6 @@ FUNCTION delta_eband() RESULT(delta_e)
   !               - \sum becsum       D1_Hxc     [for PAW]
   USE kinds,            ONLY : dp
   USE scf,              ONLY : scf_type, rho, v
-  USE funct,            ONLY : dft_is_meta
   USE fft_base,         ONLY : dfftp
   USE noncollin_module, ONLY : noncolin
   USE mp,               ONLY : mp_sum, mp_barrier
@@ -101,6 +100,7 @@ FUNCTION delta_eband() RESULT(delta_e)
   USE ldaU,             ONLY : lda_plus_U
   USE cell_base,        ONLY : omega
   USE lsda_mod,         ONLY : nspin
+  USE xc_lib,           ONLY : xclib_dft_is
   IMPLICIT NONE
   REAL(DP) :: delta_e, delta_e_hub
   integer :: ir
@@ -118,7 +118,7 @@ FUNCTION delta_eband() RESULT(delta_e)
      delta_e = - SUM( rho%of_r(:,:)*v%of_r(:,:) )
   ENDIF
   !
-  IF ( dft_is_meta() ) &
+  IF ( xclib_dft_is('meta') ) &
      delta_e = delta_e - SUM( rho%kin_r(:,:)*v%kin_r(:,:) )
   !
   delta_e = omega * delta_e / ( dfftp%nr1*dfftp%nr2*dfftp%nr3 )

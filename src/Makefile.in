@@ -5,26 +5,41 @@ include $(QE_SOURCE)/make.inc
 DFLAGS += @dflags_tddft@
 
 # location of needed modules
-MODFLAGS = $(MOD_FLAG)$(QE_SOURCE)/iotk/src $(MOD_FLAG)$(QE_SOURCE)/Modules \
-           $(MOD_FLAG)$(QE_SOURCE)/FFTXlib $(MOD_FLAG)$(QE_SOURCE)/LAXlib \
-           $(MOD_FLAG)$(QE_SOURCE)/KS_Solvers/CG $(MOD_FLAG)$(QE_SOURCE)/KS_Solvers/Davidson \
+BASEMOD_FLAGS= $(MOD_FLAG)$(QE_SOURCE)/upflib \
+               $(MOD_FLAG)$(QE_SOURCE)/Modules \
+               $(MOD_FLAG)$(QE_SOURCE)/MBD \
+               $(MOD_FLAG)$(QE_SOURCE)/FFTXlib \
+               $(MOD_FLAG)$(QE_SOURCE)/LAXlib \
+               $(MOD_FLAG)$(QE_SOURCE)/UtilXlib \
+               $(MOD_FLAG)$(QE_SOURCE)/XClib
+
+MODFLAGS = $(BASEMOD_FLAGS) \
            $(MOD_FLAG)$(QE_SOURCE)/PW/src \
-           $(MOD_FLAG)$(QE_SOURCE)/UtilXlib $(MOD_FLAG).
+           $(MOD_FLAG)$(QE_SOURCE)/dft-d3 \
+           $(MOD_FLAG)$(QE_SOURCE)/LR_Modules \
+           $(MOD_FLAG).
 
 TDDFT_OBJS = tddft_version.o tddft_module.o tddft_main.o tddft_routines.o \
 	     tddft_setup.o tddft_ch_psi_all.o tddft_cgsolver.o \
 	     update_ham.o apply_efield.o molecule_optical_absorption.o \
 	     molecule_operators.o stop_code.o trajectory.o wavepacket.o
 
-LIBOBJS = $(QE_SOURCE)/clib/clib.a $(QE_SOURCE)/iotk/src/libiotk.a
+LIBOBJS = $(QE_SOURCE)/clib/clib.a
+
 QEMODS = $(QE_SOURCE)/Modules/libqemod.a \
+         $(QE_SOURCE)/MBD/libmbd.a \
          $(QE_SOURCE)/KS_Solvers/Davidson/libdavid.a \
          $(QE_SOURCE)/KS_Solvers/CG/libcg.a \
          $(QE_SOURCE)/KS_Solvers/PPCG/libppcg.a \
+         $(QE_SOURCE)/KS_Solvers/libks_solvers.a \
          $(QE_SOURCE)/FFTXlib/libqefft.a \
          $(QE_SOURCE)/LAXlib/libqela.a \
          $(QE_SOURCE)/UtilXlib/libutil.a \
-	 $(QE_SOURCE)/dft-d3/libdftd3qe.a
+         $(QE_SOURCE)/upflib/libupf.a \
+         $(QE_SOURCE)/dft-d3/libdftd3qe.a \
+         $(QE_SOURCE)/LR_Modules/liblrmod.a \
+         $(QE_SOURCE)/XClib/xc_lib.a
+
 
 PWOBJS = $(QE_SOURCE)/PW/src/libpw.a
 

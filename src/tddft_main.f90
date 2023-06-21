@@ -23,7 +23,9 @@ PROGRAM tddft_main
   USE check_stop,      ONLY : check_stop_init
   USE control_flags,   ONLY : io_level, gamma_only, use_para_diag
   USE mp_global,       ONLY : mp_startup
+  USE mp_bands,        ONLY : intra_bgrp_comm, inter_bgrp_comm
   USE mp_bands,        ONLY : nbgrp
+  USE mp_pools,        ONLY : intra_pool_comm
   USE mp_world,        ONLY : world_comm
   USE environment,     ONLY : environment_start, environment_end
   USE wvfct,           ONLY : nbnd
@@ -36,7 +38,6 @@ PROGRAM tddft_main
   USE ions_base,        ONLY : nat, ntyp => nsp
   USE cell_base,        ONLY : ibrav
   USE tddft_version
-  USE iotk_module  
   !------------------------------------------------------------------------
   IMPLICIT NONE
   CHARACTER (LEN=9)   :: code = 'TDDFT'
@@ -49,6 +50,14 @@ PROGRAM tddft_main
 #else
   call mp_startup(start_images=.false.)
 #endif
+
+!!#ifndef __BANDS
+!!  call mp_start_diag(ndiag_, world_comm, intra_pool_comm, do_distr_diag_inside_bgrp_=.false.)
+!!#else
+!!  call mp_start_diag(ndiag_, world_comm, intra_pool_comm, do_distr_diag_inside_bgrp_=.true.)
+!!#endif
+  call set_mpi_comm_4_solvers( intra_pool_comm, intra_bgrp_comm, inter_bgrp_comm)
+
   call environment_start (code)
 
   ! read plugin command line arguments, if any
@@ -73,11 +82,6 @@ PROGRAM tddft_main
  
   ! read ground state wavefunctions
   call read_file
-#ifdef __MPI
-  use_para_diag = check_para_diag(nbnd)
-#else
-  use_para_diag = .false.
-#endif
 
   call tddft_openfil
 
@@ -92,6 +96,7 @@ PROGRAM tddft_main
   ntyp_ = ntyp
   ibrav_ = ibrav
   assume_isolated_ = 'none'
+
   call plugin_read_input()
   call tddft_allocate()
   call tddft_setup()

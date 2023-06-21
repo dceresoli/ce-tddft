@@ -16,11 +16,12 @@ SUBROUTINE tddft_setup
   USE io_global,     ONLY : stdout
   USE wvfct,         ONLY : nbnd, et, wg
   USE lsda_mod,      ONLY : nspin
-  USE scf,           ONLY : v, vrs, vltot, kedtau
+  USE scf,           ONLY : v, vrs, vltot, kedtau, rho
   USE fft_base,      ONLY : dfftp
   USE gvecs,         ONLY : doublegrid
-  USE klist,         ONLY : degauss, ngauss, nks, lgauss, wk, two_fermi_energies
-  USE klist,         ONLY : ltetra
+  USE gvect,         ONLY : ecutrho, ngm, g, gg, eigts1, eigts2, eigts3
+  USE klist,         ONLY : degauss, ngauss, nks, lgauss, wk, two_fermi_energies, ltetra
+  USE ions_base,     ONLY : nat, nsp, ityp, tau
   USE noncollin_module,  ONLY : noncolin
   USE constants,     ONLY : degspin, pi
   USE mp_pools,      ONLY : inter_pool_comm 
@@ -28,6 +29,8 @@ SUBROUTINE tddft_setup
   USE dfunct,        ONLY : newd
   USE pwcom,         ONLY : ef
   USE constants,     ONLY : rytoev
+  USE cell_base,     ONLY : alat, at, bg, omega
+  USE mp_bands,      ONLY : intra_bgrp_comm
   USE tddft_module
 
   implicit none
@@ -37,8 +40,8 @@ SUBROUTINE tddft_setup
   call start_clock ('tddft_setup')
     
   ! initialize pseudopotentials and projectors for LDA+U
-  call init_us_1
-  call init_at_1
+  call init_us_1(nat, ityp, omega, ngm, g, gg, intra_bgrp_comm)
+  call init_tab_atwfc(omega, intra_bgrp_comm)
 
   ! computes the total local potential (external+scf) on the smooth grid
   call setlocal

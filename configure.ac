@@ -1,5 +1,5 @@
 # Autoconf template for ce-tddft
-AC_INIT(ce-tddft, 6.5, dceresoli@gmail.com, ce-tddft)
+AC_INIT(ce-tddft, 6.8, dceresoli@gmail.com, ce-tddft)
 
 # Option: Quantum-Espresso source directory (QE_SOURCE)
 AC_ARG_WITH(qe-source,
@@ -21,28 +21,16 @@ abspath=`readlink -f ${qe_source} 2>/dev/null` && qe_source=$abspath
 AC_CHECK_FILE(${qe_source}/make.inc, [], [AC_MSG_ERROR([Cannot find make.inc in ${qe_source}])])
 
 # Look for Modules/version.f90
-AC_CHECK_FILE(${qe_source}/Modules/version.f90, [], [AC_MSG_ERROR([Cannot find version.f90 in ${qe_source}/Modules])])
+AC_CHECK_FILE(${qe_source}/include/qe_version.h, [], [AC_MSG_ERROR([Cannot find qe_version.h in ${qe_source}/include])])
 
 # Extract version
 AC_MSG_CHECKING([Quantum-Espresso version])
-version=`grep version_number ${qe_source}/Modules/version.f90 | cut -d\' -f2`
+version=`grep version_number ${qe_source}/include/qe_version.h | cut -d\' -f2`
 AC_MSG_RESULT([$version])
 case $version in
-  6.4*   ) ;;
-  6.5*   ) ;;
+  6.8*   ) ;;
   *) AC_MSG_ERROR([Cannot compile against this version of Quantum-Espresso]) ;;
 esac
-
-## Extract svn revision
-#AC_MSG_CHECKING([Quantum-Espresso SVN revision])
-#revision=`grep svn_revision ${qe_source}/Modules/version.f90 | cut -d\' -f2 | tr -d M | cut -d: -f 1`
-#AC_MSG_RESULT([$revision])
-#good_revision=13949
-#if test $revision != "unknown" ; then
-#  if test $revision -lt ${good_revision} ; then
-#    AC_MSG_ERROR([Cannot compile against this SVN revision of Quantum-Espresso. Please checkout revision >$good_revision])
-#  fi
-#fi
 
 ## process options
 #dflags_gipaw=''
