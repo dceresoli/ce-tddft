@@ -1,6 +1,6 @@
 #!/bin/bash
 
-pw="mpirun -np 8 $HOME/Codes/qe-6.8/bin/pw.x"
+pw="mpirun -np 8 $HOME/Codes/qe-7.2/bin/pw.x"
 tddft="mpirun -np 8 ../../bin/tddft.x"
 
 molecule=C6H6

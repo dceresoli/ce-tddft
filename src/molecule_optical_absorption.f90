@@ -34,6 +34,7 @@ subroutine molecule_optical_absorption
   USE buffers,                     ONLY : get_buffer, save_buffer
   USE fixed_occ,                   ONLY : tfixed_occ 
   USE uspp,                        ONLY : nkb, vkb
+  USE uspp_init,                   ONLY : init_us_2
   USE ener,                        ONLY : ef
   USE dynamics_module,             ONLY : vel, verlet, allocate_dyn_vars, deallocate_dyn_vars
   USE pwcom
