@@ -16,6 +16,7 @@ subroutine molecule_optical_absorption
   !                                             Xiaofeng Qian, MIT (2008)
   !----------------------------------------------------------------------
   USE kinds,                       ONLY : dp
+  USE constants,                   ONLY : rytoev
   USE io_global,                   ONLY : stdout, ionode
   USE io_files,                    ONLY : nwordwfc, iunwfc
   USE ions_base,                   ONLY : nat, if_pos
@@ -33,6 +34,7 @@ subroutine molecule_optical_absorption
   USE buffers,                     ONLY : get_buffer, save_buffer
   USE fixed_occ,                   ONLY : tfixed_occ 
   USE uspp,                        ONLY : nkb, vkb
+  USE ener,                        ONLY : ef
   USE dynamics_module,             ONLY : vel, verlet, allocate_dyn_vars, deallocate_dyn_vars
   USE pwcom
   USE tddft_module
@@ -187,6 +189,7 @@ subroutine molecule_optical_absorption
     if (ionode) then
       do is = 1, nspin
         write(stdout,'(''ENERGY '',2X,I6,5F16.8)') istep, etot, eband + deband, ehart, etxc+etxcc, ewld
+        if (degauss > 0.d0) write(stdout,'(''EFERMI '',F16.8)') ef*rytoev
         write(stdout,'(''CHARGE '',I1,1X,I6,3E16.6)') is, istep, charge(is)
         write(stdout,'(''DIP    '',I1,1X,I6,3E16.6)') is, istep, dipole(:,is)
         if (iverbosity > 11) write(stdout,'(''CPUTIME'',F16.6)') get_clock('TDDFT') - wclock
