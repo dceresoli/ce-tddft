@@ -14,7 +14,7 @@ SUBROUTINE update_hamiltonian(istep)
   !
   USE kinds,         ONLY : dp
   USE ldaU,          ONLY : lda_plus_U
-  USE scf,           ONLY : rho, rho_core, rhog_core, vltot, v, kedtau, vrs
+  USE scf,           ONLY : rho, rho_core, rhog_core, vltot, v, kedtau, vrs, tau_core
   USE fft_base,      ONLY : dfftp
   USE gvecs,         ONLY : doublegrid
   USE io_global,     ONLY : stdout
@@ -51,7 +51,7 @@ SUBROUTINE update_hamiltonian(istep)
   end if
     
   ! calculate HXC-potential
-  call v_of_rho( rho, rho_core, rhog_core, ehart, etxc, vtxc, eth, etotefield, charge, v )
+  call v_of_rho( rho, rho_core, rhog_core, tau_core, ehart, etxc, vtxc, eth, etotefield, charge, v )
     
   ! calculate total local potential (external + scf)
   call setlocal
